@@ -1,5 +1,5 @@
 {
-    "name": "ghazym/module-build",
+    "name": "ghazym/module-builder",
     "description": "A Laravel package for custom module building",
     "type": "laravel-package",
     "license": "MIT",
@@ -15,18 +15,18 @@
     },
     "autoload": {
         "psr-4": {
-            "Ghazym\\ModuleBuild\\": "src/"
+            "Ghazym\\ModuleBuilder\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Ghazym\\ModuleBuild\\Tests\\": "tests/"
+            "Ghazym\\ModuleBuilder\\Tests\\": "tests/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Ghazym\\ModuleBuild\\ModuleBuildServiceProvider"
+                "Ghazym\\ModuleBuilder\\ModuleBuilderServiceProvider"
             ]
         }
     },
