@@ -71,15 +71,6 @@ class ModuleBuilderServiceProvider extends ServiceProvider
             return;
         }
 
-        // Add use statements if they don't exist
-        if (!str_contains($content, 'use Ghazym\ModuleBuilder\Database\Seeders\PermissionSeeder;')) {
-            $content = str_replace(
-                'use Illuminate\Database\Seeder;',
-                "use Illuminate\Database\Seeder;\nuse Ghazym\ModuleBuilder\Database\Seeders\PermissionSeeder;\nuse Ghazym\ModuleBuilder\Database\Seeders\RoleSeeder;",
-                $content
-            );
-        }
-
         // Add seeder calls in the run method
         if (str_contains($content, 'public function run(): void')) {
             $content = preg_replace(

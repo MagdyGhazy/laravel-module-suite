@@ -1,6 +1,6 @@
 <?php
 
-namespace Ghazym\ModuleBuilder\Database\Seeders;
+namespace Database\Seeders;
 
 use Ghazym\ModuleBuilder\Models\Role;
 use Ghazym\ModuleBuilder\Models\Permission;
