@@ -19,6 +19,9 @@ class ModuleBuilderServiceProvider extends ServiceProvider
         // Register middleware
         $this->app['router']->aliasMiddleware('permission', CheckPermission::class);
 
+        // Load package routes
+        $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
+
         // Register the command
         if ($this->app->runningInConsole()) {
             $this->commands([

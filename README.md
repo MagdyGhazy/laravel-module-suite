@@ -54,6 +54,25 @@ The package includes a complete role and permission system:
 2. **Permissions**: Granular control over user actions
 3. **Middleware**: Built-in permission checking middleware
 
+#### Package Routes
+
+The package automatically registers the following routes:
+
+```php
+// Role Management Routes
+Route::group(['prefix' => 'role', 'middleware' => 'auth:sanctum'], function () {
+    Route::get('/', 'index')->middleware('permission:list roles');
+    Route::get('/{id}', 'show')->middleware('permission:show roles');
+    Route::post('/', 'store')->middleware('permission:create roles');
+    Route::put('/{id}', 'update')->middleware('permission:edit roles');
+    Route::delete('/{id}', 'destroy')->middleware('permission:delete roles');
+    Route::get('all/permissions', 'allPermissions')->middleware('permission:list permissions');
+    Route::put('permission/{id}', 'updatePermission')->middleware('permission:edit permissions');
+});
+```
+
+These routes are automatically loaded when the package is installed. You can customize the middleware and prefix in the configuration file.
+
 #### Permission Methods
 
 The package provides several methods for managing permissions:
