@@ -1,6 +1,6 @@
 # Laravel Module Builder
 
-A Laravel package for custom module building with repository pattern and standardized API responses.
+A Laravel package for building custom modules with built-in role and permission management.
 
 ## Prerequisites
 
@@ -21,32 +21,169 @@ You can install the package via composer:
 composer require ghazym/module-builder
 ```
 
-## Configuration
-
-Publish the configuration file:
+After installing the package, publish the configuration file:
 
 ```bash
 php artisan vendor:publish --provider="Ghazym\ModuleBuilder\ModuleBuilderServiceProvider"
 ```
 
-## Usage
+## Features
 
-To create a new module, use the following command:
+### Module Generation
+
+Generate complete modules with a single command:
 
 ```bash
 php artisan make:module ModuleName
 ```
 
-This will generate:
+This will create:
 - Model with migration
-- Service class with repository pattern
-- API Controller with standardized responses
-- Form Request classes for validation
+- Service class
+- Controller
+- Form Requests (Store/Update)
 - Seeder
-- API Routes with permissions
-- Required traits (RepositoryTrait and ResponseTrait)
+- Routes with permissions
+- API endpoints
 
-## Generated Structure
+### Role and Permission Management
+
+The package includes a complete role and permission system:
+
+1. **Roles**: Manage user roles with different permission sets
+2. **Permissions**: Granular control over user actions
+3. **Middleware**: Built-in permission checking middleware
+
+#### Permission Methods
+
+The package provides several methods for managing permissions:
+
+```php
+// Assign a role to a user (multiple ways)
+$user->assignRole(1);                    // Using role ID
+$user->assignRole('admin');              // Using role name
+$user->assignRole($roleModel);           // Using role model instance
+
+// Get all permissions for a user
+$permissions = $user->getPermissions();  // Returns array of permission names
+
+// Check permissions
+$user->hasPermission('edit user');       // Check single permission
+$user->hasAnyPermission(['create user', 'edit user']);  // Check if user has any of these permissions
+$user->hasAllPermissions(['create user', 'edit user']); // Check if user has all of these permissions
+```
+
+### Configuration
+
+The package is highly configurable through the `config/module-builder.php` file:
+
+```php
+return [
+    // Auth middleware configuration
+    'auth' => [
+        'middleware' => 'auth:sanctum', // Customize authentication middleware
+    ],
+
+    // Role and permission settings
+    'roles' => [
+        'table' => 'roles',
+        'model' => \Ghazym\ModuleBuilder\Models\Role::class,
+        'default_roles' => [
+            'admin' => [
+                'name' => 'Admin',
+                'description' => 'Administrator with full access',
+            ],
+        ],
+    ],
+
+    'permissions' => [
+        'table' => 'permissions',
+        'model' => \Ghazym\ModuleBuilder\Models\Permission::class,
+        'default_permissions' => [
+            // User permissions
+            'list users' => 'View list of users',
+            'show user' => 'View user details',
+            'create user' => 'Create new users',
+            'edit user' => 'Edit existing users',
+            'delete user' => 'Delete users',
+
+            // Role permissions
+            'list roles' => 'View list of roles',
+            'show role' => 'View role details',
+            'create role' => 'Create new roles',
+            'edit role' => 'Edit existing roles',
+            'delete role' => 'Delete roles',
+
+            // Permission permissions
+            'list permissions' => 'View list of permissions',
+            'edit permission' => 'Edit existing permissions',
+        ],
+    ],
+
+    // Middleware configuration
+    'middleware' => [
+        'permission' => [
+            'name' => 'permission',
+            'class' => \Ghazym\ModuleBuilder\Middleware\CheckPermission::class,
+        ],
+    ],
+
+    // Response format configuration
+    'response' => [
+        'success' => [
+            'success' => true,
+            'message' => 'Operation completed successfully',
+            'data' => null,
+            'errors' => null,
+        ],
+        'error' => [
+            'success' => false,
+            'message' => 'Operation failed',
+            'data' => null,
+            'errors' => null,
+        ],
+    ],
+];
+```
+
+### Usage
+
+1. **Add HasPermissions Trait to User Model**:
+```php
+use Ghazym\ModuleBuilder\Traits\HasPermissions;
+
+class User extends Authenticatable
+{
+    use HasPermissions;
+    // ...
+}
+```
+
+2. **Use Permission Middleware in Routes**:
+```php
+Route::middleware('permission:list users')->group(function () {
+    Route::get('/users', [UserController::class, 'index']);
+});
+```
+
+3. **Check Permissions in Code**:
+```php
+if ($user->hasPermission('edit user')) {
+    // User can edit users
+}
+
+if ($user->hasAnyPermission(['create user', 'edit user'])) {
+    // User can create or edit users
+}
+
+if ($user->hasAllPermissions(['create user', 'edit user'])) {
+    // User can both create and edit users
+}
+```
+
+### Generated Module Structure
+
+When you run `make:module`, it creates:
 
 ```
 app/
@@ -74,29 +211,25 @@ app/
         └── ModuleNameSeeder.php
 ```
 
-## Features
+### API Response Format
 
-- Repository Pattern implementation
-- Standardized API responses
-- Automatic route generation with permissions
-- Form request validation
-- Database seeding support
-- Type-safe code generation
-- Pagination support
-- Search functionality
-- Proper error handling
+All API responses follow a consistent format:
 
-## Contributing
+```json
+{
+    "success": true,
+    "message": "Operation completed successfully",
+    "data": {
+        // Response data
+    },
+    "errors": null
+}
+```
 
-Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+## Requirements
 
-## Security
-
-If you discover any security related issues, please email magdyghazy04@gmail.com instead of using the issue tracker.
-
-## Credits
-
-- [Magdy Ghazy](https://github.com/ghazym)
+- PHP >= 8.0
+- Laravel >= 9.0
 
 ## License
 
