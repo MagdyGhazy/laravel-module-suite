@@ -20,11 +20,11 @@ class ModuleBuilderServiceProvider extends ServiceProvider
             $this->commands([
                 MakeModuleCommand::class,
             ]);
-        }
 
-        // Publish configuration
-        $this->publishes([
-            __DIR__.'/../config/module-builder.php' => config_path('module-builder.php'),
-        ], 'config');
+            // Publish configuration
+            $this->publishes([
+                __DIR__.'/../config/module-builder.php' => config_path('module-builder.php'),
+            ], 'config');
+        }
     }
 }

@@ -2,22 +2,29 @@
 
 namespace App\Http\Services\{{ name }};
 
-use App\Http\Traits\RepositoryTrait;
+use Ghazym\ModuleBuilder\Traits\RepositoryTrait;
 use App\Models\{{ name }};
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class {{ service_name }}
 {
     use RepositoryTrait;
 
-    protected $model;
+    protected {{ name }} $model;
 
     public function __construct()
     {
         $this->model = new {{ name }}();
     }
 
-    public function index()
+    /**
+     * Get paginated list of records
+     *
+     * @return LengthAwarePaginator
+     */
+    public function index(): LengthAwarePaginator
     {
         $search  = request()->get('search');
         $perPage = request()->get('limit', 10);
@@ -39,7 +46,13 @@ class {{ service_name }}
         return $query->paginate($perPage);
     }
 
-    public function show(int $id)
+    /**
+     * Get single record by ID
+     *
+     * @param int $id
+     * @return {{ name }}|array|null
+     */
+    public function show(int $id): {{ name }}|array|null
     {
         $parameters = [
             'select'    => ['id'],
@@ -52,22 +65,48 @@ class {{ service_name }}
         return $this->getOne($this->model, $id, $parameters);
     }
 
-    public function store(array $request)
+    /**
+     * Create new record
+     *
+     * @param array $request
+     * @return {{ name }}|array
+     */
+    public function store(array $request): {{ name }}|array
     {
         return $this->create($this->model, $request);
     }
 
-    public function update(array $request, int $id)
+    /**
+     * Update existing record
+     *
+     * @param array $request
+     * @param int $id
+     * @return {{ name }}|array|null
+     */
+    public function update(array $request, int $id): {{ name }}|array|null
     {
         return $this->edit($this->model, $request, $id);
     }
 
-    public function destroy(int $id)
+    /**
+     * Delete record
+     *
+     * @param int $id
+     * @return bool|array
+     */
+    public function destroy(int $id): bool|array
     {
         return $this->delete($this->model, $id);
     }
 
-    protected function filter(Builder $query, $search)
+    /**
+     * Filter query by search term
+     *
+     * @param Builder $query
+     * @param string $search
+     * @return Builder
+     */
+    protected function filter(Builder $query, string $search): Builder
     {
         return $query->where(function (Builder $q) use ($search) {
             $q->where('id', 'LIKE', "%{$search}%");

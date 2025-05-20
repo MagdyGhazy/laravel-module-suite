@@ -24,10 +24,6 @@ class MakeModuleCommand extends Command
 
     public function handle()
     {
-        if (!$this->checkAndSetupPrerequisites()) {
-            return;
-        }
-
         $this->initializeNames();
         $this->initializePaths();
 
@@ -51,95 +47,23 @@ class MakeModuleCommand extends Command
         $this->info("Service, Requests, Routes, permissions, seeder, Model and migration created for {$this->names['name']}");
     }
 
-    protected function checkAndSetupPrerequisites(): bool
-    {
-        if (!$this->checkAndPublishStubs()) {
-            return false;
-        }
-
-        if (!$this->checkAndSetupApiRoute()) {
-            return false;
-        }
-
-        return true;
-    }
-
-    protected function checkAndPublishStubs(): bool
-    {
-        $stubsPath = base_path('stubs');
-        $packageStubsPath = __DIR__ . '/../../stubs';
-
-        if (!File::exists($stubsPath)) {
-            $this->info('Publishing Laravel stubs...');
-            try {
-                Artisan::call('stub:publish');
-                $this->info('Laravel stubs published successfully.');
-            } catch (\Exception $e) {
-                $this->error('Failed to publish stubs: ' . $e->getMessage());
-                return false;
-            }
-        }
-
-        // Copy custom stubs
-        try {
-            if (!File::exists($packageStubsPath)) {
-                $this->error("Package stubs directory not found at: {$packageStubsPath}");
-                return false;
-            }
-
-            foreach ($this->stubs as $stub) {
-                $source = $packageStubsPath . '/' . $stub;
-                $destination = $stubsPath . '/' . $stub;
-
-                if (!File::exists($source)) {
-                    $this->error("Stub file not found: {$source}");
-                    return false;
-                }
-
-                File::copy($source, $destination);
-                $this->info("Copied {$stub} to application stubs directory.");
-            }
-
-            $this->info('Custom stubs copied successfully.');
-        } catch (\Exception $e) {
-            $this->error('Failed to copy custom stubs: ' . $e->getMessage());
-            return false;
-        }
-
-        return true;
-    }
-
-    protected function checkAndSetupApiRoute(): bool
-    {
-        $laravelVersion = Application::VERSION;
-        
-        if (version_compare($laravelVersion, '11.0.0', '>=')) {
-            if (!File::exists(base_path('routes/api.php'))) {
-                $this->info('Setting up API routes...');
-                try {
-                    Artisan::call('install:api');
-                    $this->info('API routes setup completed.');
-                } catch (\Exception $e) {
-                    $this->error('Failed to setup API routes: ' . $e->getMessage());
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
     protected function initializeNames(): void
     {
+        $name = ucfirst($this->argument('name'));
+        $small_name = strtolower($name);
+        $plural_name = Str::plural($name);
+        $small_plural_name = Str::plural($small_name);
+        
         $this->names = [
-            'name' => ucfirst($this->argument('name')),
-            'small_name' => strtolower($this->argument('name')),
-            'class_name' => ucfirst($this->argument('name')) . 'Service',
-            'controller_name' => ucfirst($this->argument('name')) . 'Controller',
-            'seeder_name' => ucfirst($this->argument('name')) . 'Seeder',
-            'store_request' => 'Store' . ucfirst($this->argument('name')) . 'Request',
-            'update_request' => 'Update' . ucfirst($this->argument('name')) . 'Request',
-            'plural_name' => Str::plural(ucfirst($this->argument('name'))),
-            'small_plural_name' => Str::plural(strtolower($this->argument('name'))),
+            'name' => $name,
+            'small_name' => $small_name,
+            'class_name' => $name . 'Service',
+            'controller_name' => $name . 'Controller',
+            'seeder_name' => $name . 'Seeder',
+            'store_request' => 'Store' . $name . 'Request',
+            'update_request' => 'Update' . $name . 'Request',
+            'plural_name' => $plural_name,
+            'small_plural_name' => $small_plural_name,
         ];
     }
 
@@ -150,8 +74,8 @@ class MakeModuleCommand extends Command
             'service_path' => app_path("Http/Services/{$this->names['name']}/{$this->names['class_name']}.php"),
             'controller_directory' => app_path("Http/Controllers/Api/{$this->names['name']}"),
             'controller_path' => app_path("Http/Controllers/Api/{$this->names['name']}/{$this->names['controller_name']}.php"),
-            'service_stub' => base_path('stubs/service.stub'),
-            'controller_stub' => base_path('stubs/controller.module.stub'),
+            'service_stub' => __DIR__ . '/../../stubs/service.stub',
+            'controller_stub' => __DIR__ . '/../../stubs/controller.module.stub',
         ];
     }
 
@@ -179,12 +103,12 @@ class MakeModuleCommand extends Command
     protected function checkStubFiles(): bool
     {
         if (!File::exists($this->paths['service_stub'])) {
-            $this->error("Stub file not found at: stubs/service.stub");
+            $this->error("Stub file not found at: {$this->paths['service_stub']}");
             return false;
         }
 
         if (!File::exists($this->paths['controller_stub'])) {
-            $this->error("Stub file not found at: stubs/controller.module.stub");
+            $this->error("Stub file not found at: {$this->paths['controller_stub']}");
             return false;
         }
 
@@ -201,28 +125,26 @@ class MakeModuleCommand extends Command
 
     protected function generateServiceAndController(): void
     {
+        $serviceContent = File::get($this->paths['service_stub']);
+        $serviceContent = $this->replacePlaceholders($serviceContent);
+        File::put($this->paths['service_path'], $serviceContent);
+
+        $controllerContent = File::get($this->paths['controller_stub']);
+        $controllerContent = $this->replacePlaceholders($controllerContent);
+        File::put($this->paths['controller_path'], $controllerContent);
+    }
+
+    protected function replacePlaceholders(string $content): string
+    {
         $replacements = [
             '{{ name }}' => $this->names['name'],
             '{{ service_name }}' => $this->names['class_name'],
             '{{ controller_name }}' => $this->names['controller_name'],
             '{{ store_request }}' => $this->names['store_request'],
-            '{{ update_request }}' => $this->names['update_request']
+            '{{ update_request }}' => $this->names['update_request'],
         ];
 
-        $service_content = str_replace(
-            array_keys($replacements),
-            array_values($replacements),
-            File::get($this->paths['service_stub'])
-        );
-
-        $controller_content = str_replace(
-            array_keys($replacements),
-            array_values($replacements),
-            File::get($this->paths['controller_stub'])
-        );
-
-        File::put($this->paths['service_path'], $service_content);
-        File::put($this->paths['controller_path'], $controller_content);
+        return str_replace(array_keys($replacements), array_values($replacements), $content);
     }
 
     protected function appendRoutes(): void
