@@ -1,6 +1,17 @@
 # Laravel Module Builder
 
-A Laravel package for quickly building modular applications with a standardized structure.
+A Laravel package for custom module building with repository pattern and standardized API responses.
+
+## Prerequisites
+
+Before using this package, ensure you have:
+
+1. Laravel 9.x, 10.x, 11.x, or 12.x installed
+2. API routes configured in your Laravel application
+   - For Laravel 11+, run `php artisan install:api` if you haven't already
+   - For earlier versions, ensure `routes/api.php` exists and is properly configured
+3. Sanctum authentication set up (for API authentication)
+4. Spatie Permission package installed (for role and permission management)
 
 ## Installation
 
@@ -20,47 +31,60 @@ php artisan vendor:publish --provider="Ghazym\ModuleBuilder\ModuleBuilderService
 
 ## Usage
 
-Create a new module using the command:
+To create a new module, use the following command:
 
 ```bash
-php artisan make:module YourModuleName
+php artisan make:module ModuleName
 ```
 
 This will generate:
 - Model with migration
-- API Controller
-- Service class
-- Form Request classes
-- API routes
-- Permissions
-- Database seeder
+- Service class with repository pattern
+- API Controller with standardized responses
+- Form Request classes for validation
+- Seeder
+- API Routes with permissions
+- Required traits (RepositoryTrait and ResponseTrait)
 
-## Structure
-
-The generated module will follow this structure:
+## Generated Structure
 
 ```
 app/
 ├── Http/
 │   ├── Controllers/
 │   │   └── Api/
-│   │       └── YourModule/
-│   │           └── YourModuleController.php
+│   │       └── ModuleName/
+│   │           └── ModuleNameController.php
+│   ├── Requests/
+│   │   └── ModuleName/
+│   │       ├── StoreModuleNameRequest.php
+│   │       └── UpdateModuleNameRequest.php
 │   ├── Services/
-│   │   └── YourModule/
-│   │       └── YourModuleService.php
-│   └── Requests/
-│       └── YourModule/
-│           ├── StoreYourModuleRequest.php
-│           └── UpdateYourModuleRequest.php
+│   │   └── ModuleName/
+│   │       └── ModuleNameService.php
+│   └── Traits/
+│       ├── RepositoryTrait.php
+│       └── ResponseTrait.php
 ├── Models/
-│   └── YourModule.php
+│   └── ModuleName.php
 └── database/
     ├── migrations/
-    │   └── xxxx_xx_xx_create_your_modules_table.php
+    │   └── xxxx_xx_xx_create_module_names_table.php
     └── seeders/
-        └── YourModuleSeeder.php
+        └── ModuleNameSeeder.php
 ```
+
+## Features
+
+- Repository Pattern implementation
+- Standardized API responses
+- Automatic route generation with permissions
+- Form request validation
+- Database seeding support
+- Type-safe code generation
+- Pagination support
+- Search functionality
+- Proper error handling
 
 ## Contributing
 
