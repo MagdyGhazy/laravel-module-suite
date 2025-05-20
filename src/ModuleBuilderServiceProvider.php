@@ -46,11 +46,6 @@ class ModuleBuilderServiceProvider extends ServiceProvider
                 __DIR__.'/../database/seeders/PermissionSeeder.php' => database_path('seeders/PermissionSeeder.php'),
                 __DIR__.'/../database/seeders/RoleSeeder.php' => database_path('seeders/RoleSeeder.php'),
             ], 'seeders');
-
-            // Register seeders
-            $this->app->make('db')->connection()->getSchemaBuilder()->getConnection()->statement('SET FOREIGN_KEY_CHECKS=0');
-            
-            $this->app->make('db')->connection()->getSchemaBuilder()->getConnection()->statement('SET FOREIGN_KEY_CHECKS=1');
         }
     }
 }
