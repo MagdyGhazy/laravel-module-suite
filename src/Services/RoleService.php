@@ -47,9 +47,9 @@ class RoleService
      * Get single role by ID
      *
      * @param int $id
-     * @return Role|null
+     * @return Role|array|null
      */
-    public function show(int $id): ?Role
+    public function show(int $id): Role|array|null
     {
         $parameters = [
             'select' => ['id', 'name'],
@@ -63,12 +63,12 @@ class RoleService
      * Create new role
      *
      * @param array $request
-     * @return Role
+     * @return Role|array
      */
-    public function store(array $request): Role
+    public function store(array $request): Role|array
     {
         $role = $this->create($this->model, $request);
-        
+
         if (isset($request['permissions'])) {
             $role->syncPermissions($request['permissions']);
         }
@@ -81,12 +81,12 @@ class RoleService
      *
      * @param array $request
      * @param int $id
-     * @return Role|null
+     * @return Role|array|null
      */
-    public function update(array $request, int $id): ?Role
+    public function update(array $request, int $id): Role|array|null
     {
         $role = $this->edit($this->model, $request, $id);
-        
+
         if ($role && isset($request['permissions'])) {
             $role->syncPermissions($request['permissions']);
         }
@@ -98,9 +98,9 @@ class RoleService
      * Delete role
      *
      * @param int $id
-     * @return bool
+     * @return bool|array
      */
-    public function destroy(int $id): bool
+    public function destroy(int $id): bool|array
     {
         return $this->delete($this->model, $id);
     }
@@ -143,4 +143,4 @@ class RoleService
     {
         return $this->edit(new Permission(), $request, $id);
     }
-} 
+}

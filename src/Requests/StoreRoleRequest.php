@@ -23,9 +23,9 @@ class StoreRoleRequest extends FormRequest
     {
         return [
             'name'             => 'required|string|unique:roles,name',
-            'description'      => 'required|string|max:255',
-            'permissions'      => 'required|array|min:1',
-            'permissions.*'    => 'required|integer|exists:permissions,id'
+            'description'      => 'nullable|string|max:255',
+            'permissions'      => 'nullable|array|min:1',
+            'permissions.*'    => 'nullable|integer|exists:permissions,id'
         ];
     }
 }
