@@ -43,6 +43,7 @@ class ModuleBuilderServiceProvider extends ServiceProvider
                 __DIR__.'/../database/migrations/2023_10_01_000002_create_permissions_table.php' => database_path('migrations/2023_10_01_000002_create_permissions_table.php'),
                 __DIR__.'/../database/migrations/2023_10_01_000003_create_user_role_table.php' => database_path('migrations/2023_10_01_000003_create_user_role_table.php'),
                 __DIR__.'/../database/migrations/2023_10_01_000004_create_role_permission_table.php' => database_path('migrations/2023_10_01_000004_create_role_permission_table.php'),
+                __DIR__.'/../database/migrations/2023_10_01_000005_create_media_table.php' => database_path('migrations/2023_10_01_000005_create_media_table.php'),
             ], 'migrations');
 
             // Publish seeders

@@ -2,29 +2,42 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.1.0] - 2024-03-19
+## [1.2.0] - 2024-03-19
 
 ### Added
-- Enhanced permission management system with improved methods
-- New flexible role assignment system supporting multiple input types
-- Optimized permission checking with eager loading
-- Comprehensive permission documentation in README
-- New configuration options for auth middleware
+- New Media system with polymorphic relationships
+- Media model with file management capabilities
+- HasMedia trait for easy media handling
+- Media migration for storing file information
+- File upload and management functionality
+- Support for multiple file uploads
+- File type validation and error handling
+- Transaction support for file operations
 
 ### Changed
-- Improved `assignRole` method to support multiple input types (ID, name, model)
-- Optimized `getPermissions` method with eager loading
-- Updated README with detailed permission usage examples
-- Enhanced error handling in permission methods
+- Updated package description to include media management
+- Improved error handling in file operations
+- Enhanced type safety in media operations
+- Better file cleanup on failed operations
 
-### Fixed
-- N+1 query issue in permission checking
-- Type safety improvements in role assignment
-
-## [1.0.1] - 2024-03-18
+## [1.1.0] - 2024-03-18
 
 ### Added
-- Initial release with basic module generation
-- Role and permission system
-- API response standardization
-- Configuration system 
+- Enhanced permission system with improved methods
+- Better error handling in permission operations
+- New documentation for permission methods
+- Improved role management functionality
+
+### Changed
+- Updated README with new permission features
+- Improved code organization and documentation
+- Enhanced error handling in role operations
+
+## [1.0.1] - 2024-03-17
+
+### Added
+- Initial release of the package
+- Basic RBAC functionality
+- Role and permission management
+- Custom module building capabilities
+- Basic documentation 
