@@ -1,6 +1,6 @@
 {
     "name": "ghazym/module-builder",
-    "description": "A Laravel package for custom module building",
+    "description": "A Laravel package for Role-Based Access Control (RBAC) with roles and permissions management custom module building",
     "type": "laravel-package",
     "version": "1.1.0",
     "license": "MIT",
@@ -11,8 +11,10 @@
         }
     ],
     "require": {
-        "php": "^8.0",
-        "illuminate/support": "^9.0|^10.0|^11.0|^12.0"
+        "php": "^8.0|^8.1|^8.2",
+        "illuminate/support": "^9.0|^10.0|^11.0|^12.0",
+        "illuminate/database": "^9.0|^10.0|^11.0|^12.0",
+        "illuminate/routing": "^9.0|^10.0|^11.0|^12.0"
     },
     "autoload": {
         "psr-4": {
@@ -32,8 +34,8 @@
         }
     },
     "require-dev": {
-        "orchestra/testbench": "^7.0|^8.0|^9.0|^10.0",
-        "phpunit/phpunit": "^9.0|^10.0"
+        "orchestra/testbench": "^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
+        "phpunit/phpunit": "^9.0|^10.0|^11.0|^12.0"
     },
     "minimum-stability": "stable",
     "prefer-stable": true

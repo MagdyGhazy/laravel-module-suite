@@ -185,20 +185,6 @@ Route::middleware('permission:list users')->group(function () {
 });
 ```
 
-3. **Check Permissions in Code**:
-```php
-if ($user->hasPermission('edit user')) {
-    // User can edit users
-}
-
-if ($user->hasAnyPermission(['create user', 'edit user'])) {
-    // User can create or edit users
-}
-
-if ($user->hasAllPermissions(['create user', 'edit user'])) {
-    // User can both create and edit users
-}
-```
 
 ### Generated Module Structure
 
