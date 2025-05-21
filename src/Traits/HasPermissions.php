@@ -4,25 +4,26 @@ namespace Ghazym\ModuleBuilder\Traits;
 
 use Ghazym\ModuleBuilder\Models\Permission;
 use Ghazym\ModuleBuilder\Models\Role;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Support\Collection;
 
 trait HasPermissions
 {
     /**
-     * Get all roles for the user.
+     * Get all roles for the model.
      */
-    public function roles(): BelongsToMany
+    public function roles(): MorphToMany
     {
-        return $this->belongsToMany(Role::class, 'user_role');
+        return $this->morphToMany(config('module-builder.roles.model'), 'roleable');
     }
 
     /**
-     * Assign a role to the user.
+     * Assign a role to the model.
      *
      * @param int|string|Role $role Role ID, name, or Role model instance
-     * @return bool
+     * @return bool|array
      */
-    public function assignRole($role): bool
+    public function assignRole($role): bool|array
     {
         try {
             if (is_string($role)) {
@@ -30,76 +31,104 @@ trait HasPermissions
             } elseif (is_int($role)) {
                 $role = Role::findOrFail($role);
             } elseif (!$role instanceof Role) {
-                throw new \InvalidArgumentException('Role must be an ID, name, or Role model instance');
+                return ['error' => 'Role must be an ID, name, or Role model instance'];
             }
 
-            $this->roles()->sync([$role->id]);
+            $this->roles()->attach($role->id);
             return true;
         } catch (\Exception $e) {
             report($e);
-            return false;
+            return ['error' => 'Failed to assign role'];
         }
     }
 
     /**
-     * Get all permissions for the user through their roles.
+     * Remove a role from the model.
      *
-     * @return array
+     * @param int|string|Role $role Role ID, name, or Role model instance
+     * @return bool|array
      */
-    public function getPermissions(): array
+    public function removeRole($role): bool|array
+    {
+        try {
+            if (is_string($role)) {
+                $role = Role::where('name', $role)->firstOrFail();
+            } elseif (is_int($role)) {
+                $role = Role::findOrFail($role);
+            } elseif (!$role instanceof Role) {
+                return ['error' => 'Role must be an ID, name, or Role model instance'];
+            }
+
+            $this->roles()->detach($role->id);
+            return true;
+        } catch (\Exception $e) {
+            report($e);
+            return ['error' => 'Failed to remove role'];
+        }
+    }
+
+    /**
+     * Sync roles for the model.
+     *
+     * @param array $roleIds Array of role IDs
+     * @return bool|array
+     */
+    public function syncRoles(array $roleIds): bool|array
+    {
+        try {
+            $this->roles()->sync($roleIds);
+            return true;
+        } catch (\Exception $e) {
+            report($e);
+            return ['error' => 'Failed to sync roles'];
+        }
+    }
+
+    /**
+     * Get all permissions for the model.
+     *
+     * @return Collection
+     */
+    public function getPermissions(): Collection
     {
         return $this->roles()
             ->with('permissions')
             ->get()
-            ->pluck('permissions.*.name')
+            ->pluck('permissions')
             ->flatten()
-            ->unique()
-            ->values()
-            ->toArray();
+            ->unique('id');
     }
 
     /**
-     * Check if user has a specific permission.
+     * Check if the model has a specific permission.
      *
-     * @param string $permission
+     * @param string $permission Permission name
      * @return bool
      */
     public function hasPermission(string $permission): bool
     {
-        return $this->roles()
-            ->whereHas('permissions', function ($query) use ($permission) {
-                $query->where('name', $permission);
-            })
-            ->exists();
+        return $this->getPermissions()->contains('name', $permission);
     }
 
     /**
-     * Check if user has any of the given permissions.
+     * Check if the model has any of the given permissions.
      *
-     * @param array $permissions
+     * @param array $permissions Array of permission names
      * @return bool
      */
     public function hasAnyPermission(array $permissions): bool
     {
-        return $this->roles()
-            ->whereHas('permissions', function ($query) use ($permissions) {
-                $query->whereIn('name', $permissions);
-            })
-            ->exists();
+        return $this->getPermissions()->whereIn('name', $permissions)->isNotEmpty();
     }
 
     /**
-     * Check if user has all of the given permissions.
+     * Check if the model has all of the given permissions.
      *
-     * @param array $permissions
+     * @param array $permissions Array of permission names
      * @return bool
      */
     public function hasAllPermissions(array $permissions): bool
     {
-        return $this->roles()
-            ->whereHas('permissions', function ($query) use ($permissions) {
-                $query->whereIn('name', $permissions);
-            })
-            ->count() === count($permissions);
+        return $this->getPermissions()->whereIn('name', $permissions)->count() === count($permissions);
     }
 } 

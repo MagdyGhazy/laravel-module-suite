@@ -34,7 +34,6 @@
         "orchestra/testbench": "^10.0|^11.0|^12.0",
         "phpunit/phpunit": "^10.0|^11.0|^12.0"
     },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
-    "version": "1.2.0"
+    "minimum-stability": "stable",
+    "prefer-stable": true
 }

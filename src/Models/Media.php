@@ -13,8 +13,6 @@ class Media extends Model
         'file_type',
         'file_size',
         'mime_type',
-        'mediable_type',
-        'mediable_id',
     ];
 
     protected $casts = [

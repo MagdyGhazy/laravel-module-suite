@@ -1,65 +1,187 @@
 # Laravel Module Builder
 
-A Laravel package for building custom modules with built-in role and permission management.
+A Laravel package for building custom modules with RBAC and media management.
 
-## Prerequisites
+## Features
 
-Before using this package, ensure you have:
+- Role-Based Access Control (RBAC) with polymorphic relationships
+- Media management with file uploads and storage
+- Custom module generation
+- Permission management
+- API endpoints for roles and permissions
 
-1. Laravel 9.x, 10.x, 11.x, or 12.x installed
-2. API routes configured in your Laravel application
-   - For Laravel 11+, run `php artisan install:api` if you haven't already
-   - For earlier versions, ensure `routes/api.php` exists and is properly configured
-3. Sanctum authentication set up (for API authentication)
-4. Spatie Permission package installed (for role and permission management)
+## Requirements
+
+- PHP >= 8.1
+- Laravel >= 10.0
+- Composer
 
 ## Installation
-
-You can install the package via composer:
 
 ```bash
 composer require ghazym/module-builder
 ```
 
-After installing the package, publish the configuration file:
+Publish the configuration and migrations:
 
 ```bash
 php artisan vendor:publish --provider="Ghazym\ModuleBuilder\ModuleBuilderServiceProvider"
 ```
 
-## Features
-
-### Module Generation
-
-Generate complete modules with a single command:
+Run the migrations:
 
 ```bash
-php artisan make:module ModuleName
+php artisan migrate
 ```
 
-This will create:
-- Model with migration
-- Service class
-- Controller
-- Form Requests (Store/Update)
-- Seeder
-- Routes with permissions
-- API endpoints
+## Usage
 
-### Role and Permission Management
+### Roles and Permissions
 
-The package includes a complete role and permission system:
-
-1. **Roles**: Manage user roles with different permission sets
-2. **Permissions**: Granular control over user actions
-3. **Middleware**: Built-in permission checking middleware
-
-#### Package Routes
-
-The package automatically registers the following routes:
+The package provides a polymorphic role system that can be used with any model:
 
 ```php
-// Role Management Routes
+use Ghazym\ModuleBuilder\Traits\HasPermissions;
+
+class User extends Model
+{
+    use HasPermissions;
+}
+
+class Team extends Model
+{
+    use HasPermissions;
+}
+```
+
+#### Assigning Roles
+
+```php
+// Assign a role to a model
+$user->assignRole(1);                    // Using role ID
+$user->assignRole('admin');              // Using role name
+$user->assignRole($roleModel);           // Using role model instance
+
+// Assign multiple roles
+$user->syncRoles([1, 2, 3]);            // Replace all roles
+
+// Remove a role to a model
+$user->removeRole(1);                    // Using role ID
+$user->removeRole('admin');              // Using role name
+$user->removeRole($roleModel);           // Using role model instance
+
+```
+
+#### Checking Permissions
+
+```php
+// Get all permissions for a model
+$permissions = $user->getPermissions();  // Returns array of permission names
+
+// Check permissions
+$user->hasPermission('edit user');       // Check single permission
+$user->hasAnyPermission(['create user', 'edit user']);  // Check if model has any of these permissions
+$user->hasAllPermissions(['create user', 'edit user']); // Check if model has all of these permissions
+```
+
+### Media Management
+
+The package includes a media management system with automatic file cleanup:
+
+```php
+use Ghazym\ModuleBuilder\Traits\HasMedia;
+
+class Post extends Model
+{
+    use HasMedia;
+}
+```
+
+#### Managing Media
+
+```php
+// Add media
+$model->addMedia($file, $mediaName, $folderName);
+
+// Add multiple files
+$model->addMultipleMedia($files, $mediaName, $folderName);
+
+// Get media
+$model->getMedia('profile_image');           // Get all media with name
+$model->getFirstMedia('id_images');          // Get first media
+$model->getLastMedia('licence_images');      // Get last media
+
+// Update media
+$model->updateMedia($media, $newFile, $name, $folder);
+$model->updateMultipleMedia($files, $name, $folder);
+
+// Remove media
+$model->removeMedia($media);                 // Remove single media
+$model->removeMultipleMedia($name);          // Remove all media with name
+$model->removeAllMedia();                    // Remove all media (automatic on model delete)
+```
+
+### Configuration
+
+The package is highly configurable through the `config/module-builder.php` file:
+
+```php
+return [
+    // Auth middleware configuration
+    'auth' => [
+        'middleware' => 'auth:sanctum',
+    ],
+
+    // Role and permission settings
+    'roles' => [
+        'model' => \Ghazym\ModuleBuilder\Models\Role::class,
+        'default_roles' => [
+            'super admin' => [
+                'name' => 'Super Admin',
+                'description' => 'Administrator with full access',
+            ],
+        ],
+    ],
+
+    'permissions' => [
+        'model' => \Ghazym\ModuleBuilder\Models\Permission::class,
+        'default_permissions' => [
+            // User permissions
+            'list_users' => [
+                'name' => 'list users',
+                'description' => 'View list of users',
+            ],
+            // ... more permissions
+        ],
+    ],
+
+    // Media settings
+    'media' => [
+        'max_size' => 10240, // 10MB
+        'allowed_mimes' => [
+            'image' => ['jpg', 'jpeg', 'png', 'gif'],
+            'document' => ['pdf', 'doc', 'docx'],
+            'video' => ['mp4', 'avi', 'mov'],
+        ],
+        'disk' => [
+            'default' => 'public',
+            'types' => [
+                'image' => 'public',
+                'document' => 'private',
+                'video' => 'public',
+            ],
+        ],
+        'default_folder' => 'media',
+    ],
+];
+```
+
+## API Routes
+
+The package provides the following API endpoints:
+
+```php
+// Role routes
 Route::group(['prefix' => 'role', 'middleware' => 'auth:sanctum'], function () {
     Route::get('/', 'index')->middleware('permission:list roles');
     Route::get('/{id}', 'show')->middleware('permission:show roles');
@@ -71,122 +193,12 @@ Route::group(['prefix' => 'role', 'middleware' => 'auth:sanctum'], function () {
 });
 ```
 
-These routes are automatically loaded when the package is installed. You can customize the middleware and prefix in the configuration file.
+## Security
 
-#### Permission Methods
-
-The package provides several methods for managing permissions:
-
-```php
-// Assign a role to a user (multiple ways)
-$user->assignRole(1);                    // Using role ID
-$user->assignRole('admin');              // Using role name
-$user->assignRole($roleModel);           // Using role model instance
-
-// Get all permissions for a user
-$permissions = $user->getPermissions();  // Returns array of permission names
-
-// Check permissions
-$user->hasPermission('edit user');       // Check single permission
-$user->hasAnyPermission(['create user', 'edit user']);  // Check if user has any of these permissions
-$user->hasAllPermissions(['create user', 'edit user']); // Check if user has all of these permissions
-```
-
-### Configuration
-
-The package is highly configurable through the `config/module-builder.php` file:
-
-```php
-return [
-    // Auth middleware configuration
-    'auth' => [
-        'middleware' => 'auth:sanctum', // Customize authentication middleware
-    ],
-
-    // Role and permission settings
-    'roles' => [
-        'table' => 'roles',
-        'model' => \Ghazym\ModuleBuilder\Models\Role::class,
-        'default_roles' => [
-            'admin' => [
-                'name' => 'Admin',
-                'description' => 'Administrator with full access',
-            ],
-        ],
-    ],
-
-    'permissions' => [
-        'table' => 'permissions',
-        'model' => \Ghazym\ModuleBuilder\Models\Permission::class,
-        'default_permissions' => [
-            // User permissions
-            'list users' => 'View list of users',
-            'show user' => 'View user details',
-            'create user' => 'Create new users',
-            'edit user' => 'Edit existing users',
-            'delete user' => 'Delete users',
-
-            // Role permissions
-            'list roles' => 'View list of roles',
-            'show role' => 'View role details',
-            'create role' => 'Create new roles',
-            'edit role' => 'Edit existing roles',
-            'delete role' => 'Delete roles',
-
-            // Permission permissions
-            'list permissions' => 'View list of permissions',
-            'edit permission' => 'Edit existing permissions',
-        ],
-    ],
-
-    // Middleware configuration
-    'middleware' => [
-        'permission' => [
-            'name' => 'permission',
-            'class' => \Ghazym\ModuleBuilder\Middleware\CheckPermission::class,
-        ],
-    ],
-
-    // Response format configuration
-    'response' => [
-        'success' => [
-            'success' => true,
-            'message' => 'Operation completed successfully',
-            'data' => null,
-            'errors' => null,
-        ],
-        'error' => [
-            'success' => false,
-            'message' => 'Operation failed',
-            'data' => null,
-            'errors' => null,
-        ],
-    ],
-];
-```
-
-### Usage
-
-1. **Add HasPermissions Trait to User Model**:
-```php
-use Ghazym\ModuleBuilder\Traits\HasPermissions;
-
-class User extends Authenticatable
-{
-    use HasPermissions;
-    // ...
-}
-```
-
-2. **Use Permission Middleware in Routes**:
-```php
-Route::middleware('permission:list users')->group(function () {
-    Route::get('/users', [UserController::class, 'index']);
-});
-```
-
-
-### Generated Module Structure
+- All file uploads are validated for size and type
+- Files are stored in appropriate disks based on type
+- Automatic cleanup of files when models are deleted
+- Role and permission checks are enforced through middleware
 
 When you run `make:module`, it creates:
 
@@ -231,11 +243,6 @@ All API responses follow a consistent format:
 }
 ```
 
-## Requirements
-
-- PHP >= 8.0
-- Laravel >= 9.0
-
 ## License
 
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+This package is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

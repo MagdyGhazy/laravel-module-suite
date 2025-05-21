@@ -13,6 +13,17 @@ use Exception;
 trait HasMedia
 {
     /**
+     * Boot the trait.
+     */
+    public static function bootHasMedia()
+    {
+        static::deleting(function ($model) {
+            // Delete all media files when model is deleted
+           $model->removeAllMedia();
+        });
+    }
+
+    /**
      * Get all media for the model.
      */
     public function media(): MorphMany
@@ -52,6 +63,12 @@ trait HasMedia
     public function addMedia(UploadedFile $file, string $name, string $folder): Media|array
     {
         try {
+            // Validate file
+            $validation = $this->validateFile($file);
+            if (isset($validation['error'])) {
+                return $validation;
+            }
+
             DB::beginTransaction();
 
             $filePath = $this->storeFile($file, $folder);
@@ -79,13 +96,37 @@ trait HasMedia
     }
 
     /**
+     * Validate file size and type.
+     */
+    private function validateFile(UploadedFile $file): array|bool
+    {
+        $mimeType = $file->getMimeType();
+        $fileSize = $file->getSize();
+
+        // Check if file type is allowed
+        if (!in_array($mimeType, config('module-builder.media.allowed_mimes'))) {
+            return ['error' => 'File type not allowed.'];
+        }
+
+        // Get max size for this file type or use default
+        $maxSize = config('module-builder.media.max_sizes.' . $mimeType, config('module-builder.media.max_size'));
+
+        if ($fileSize > $maxSize) {
+            $maxSizeMB = $maxSize / 1024 / 1024;
+            return ['error' => "File size exceeds maximum limit of {$maxSizeMB}MB for this file type."];
+        }
+
+        return true;
+    }
+
+    /**
      * Add multiple files to the model.
      *
      * @return array  
      */
     public function addMultipleMedia(array $files, string $name, string $folder): array
     {
-        $media = [];
+        $allMedia = [];
         $errors = [];
 
         foreach ($files as $file) {
@@ -93,7 +134,7 @@ trait HasMedia
             $media = $this->addMedia($file, $name, $folder);
 
             if ($media) {
-                $media[] = $media;
+                $allMedia[] = $media;
             } else {
                 $errors[] = [
                     'file' => $file->getClientOriginalName(),
@@ -106,7 +147,7 @@ trait HasMedia
             return ['error' => 'Some files failed to upload: ' . json_encode($errors)];
         }
 
-        return $media;
+        return $allMedia;
     }
 
     /**
@@ -158,21 +199,22 @@ trait HasMedia
      *
      * @return array  
      */
-    public function updateMultipleMedia(array $mediaFiles, string $name, string $folder): array
+    public function updateMultipleMedia(array $files, string $name, string $folder): array
     {
+        $allMedia = [];
         $errors = [];
 
-        $this->clearMultipleMedia($name);
+        $this->removeMultipleMedia($name);
 
-        foreach ($mediaFiles as $mediaFile) {
+        foreach ($files as $file) {
 
-            $media = $this->addMedia($mediaFile['file'], $name, $folder);
+            $media = $this->addMedia($file, $name, $folder);
 
             if ($media) {
-                $media[] = $media;
+                $allMedia[] = $media;
             } else {
                 $errors[] = [
-                    'file' => $mediaFile['file']->getClientOriginalName(),
+                    'file' => $file->getClientOriginalName(),
                     'error' => $media['error']
                 ];
             }   
@@ -182,7 +224,7 @@ trait HasMedia
             return ['error' => 'Some files failed to update: ' . json_encode($errors)];
         }
 
-        return $media;
+        return $allMedia;
     }
 
     /**
@@ -215,9 +257,9 @@ trait HasMedia
     /**
      * Remove multiple media.
      *
-     * @throws Exception
+     * @return bool|array
      */
-    public function clearMultipleMedia(string $name): void
+    public function removeMultipleMedia(string $name): bool|array
     {
         try {
             DB::beginTransaction();
@@ -227,9 +269,32 @@ trait HasMedia
             });
 
             DB::commit();
+            return true;
         } catch (Exception $e) {
             DB::rollBack();
-            throw $e;
+            return ['error' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Remove all media from the model.
+     *
+     * @return bool|array
+     */
+    public function removeAllMedia(): bool|array
+    {
+        try {
+            DB::beginTransaction();
+
+            $this->media()->each(function (Media $media) {
+                $this->removeMedia($media);
+            });
+
+            DB::commit();
+            return true;
+        } catch (Exception $e) {
+            DB::rollBack();
+            return ['error' => $e->getMessage()];
         }
     }
 
@@ -247,7 +312,25 @@ trait HasMedia
     private function storeFile(UploadedFile $file, string $folder): string
     {
         $fileName = 'M-' . Str::random(10) . rand(1000, 9999) . '.' . $file->getClientOriginalExtension();
-        return $file->storeAs('media/' . $folder, $fileName);
+        
+        // Determine file type category
+        $mimeType = $file->getMimeType();
+        $type = match(true) {
+            str_starts_with($mimeType, 'image/') => 'image',
+            str_starts_with($mimeType, 'video/') => 'video',
+            str_starts_with($mimeType, 'audio/') => 'audio',
+            str_starts_with($mimeType, 'application/zip') || str_starts_with($mimeType, 'application/x-rar-compressed') => 'archive',
+            default => 'document'
+        };
+
+        // Get appropriate disk for file type
+        $disk = config("module-builder.media.disk.types.{$type}", config('module-builder.media.disk.default'));
+
+        return $file->storeAs(
+            config('module-builder.media.default_folder') . '/' . $folder, 
+            $fileName, 
+            ['disk' => $disk]
+        );
     }
 
     /**

@@ -2,25 +2,38 @@
 
 namespace Database\Seeders;
 
-use Ghazym\ModuleBuilder\Models\Permission;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Log;
 
 class PermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        $permissions = [
-            'users'              => ['list', 'show', 'create', 'edit', 'delete'],
-            'roles'              => ['list', 'show', 'create', 'edit', 'delete'],
-            'permissions'        => ['list', 'edit'],
-        ];
+        try {
+            $permissionModel = config('module-builder.permissions.model');
+            $defaultPermissions = config('module-builder.permissions.default_permissions', []);
 
-        foreach ($permissions as $module => $actions) {
-            foreach ($actions as $action) {
-                Permission::firstOrCreate([
-                    'name' => "{$action} {$module}",
-                ]);
+            foreach ($defaultPermissions as $action) {
+                $permissionModel::firstOrCreate(
+                    ['name' => $action['name']],
+                    ['description' => $action['description'] ?? null]
+                );
             }
+
+            $permissions = [];
+
+            if (!empty($permissions)) {
+                foreach ($permissions as $module => $actions) {
+                    foreach ($actions as $action) {
+                        $permissionModel::firstOrCreate([
+                            'name' => "{$action} {$module}",
+                        ]);
+                    }
+                }
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Failed to seed permissions: ' . $e->getMessage());
         }
     }
 } 

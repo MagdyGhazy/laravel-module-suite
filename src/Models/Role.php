@@ -4,25 +4,58 @@ namespace Ghazym\ModuleBuilder\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Collection;
 
 class Role extends Model
 {
     protected $fillable = ['name', 'description'];
 
-
-    public function users(): BelongsToMany
+    /**
+     * Get all models that have this role.
+     */
+    public function roleables(): MorphMany
     {
-        return $this->belongsToMany(User::class, 'user_role');
+        return $this->morphMany(config('module-builder.roles.model'), 'roleable');
     }
 
+    /**
+     * Get all permissions associated with this role.
+     */
     public function permissions(): BelongsToMany
     {
-        return $this->belongsToMany(Permission::class, 'role_permission');
+        return $this->belongsToMany(config('module-builder.permissions.model'), 'role_permission');
     }
 
-    public function syncPermissions($permissionIds)
+    /**
+     * Sync permissions for this role.
+     *
+     * @param array|Collection $permissionIds
+     * @return void
+     */
+    public function syncPermissions($permissionIds): void
     {
         $this->permissions()->sync($permissionIds);
+    }
+
+    /**
+     * Get all permission names for this role.
+     *
+     * @return Collection
+     */
+    public function getPermissionNames(): Collection
+    {
+        return $this->permissions()->pluck('name');
+    }
+
+    /**
+     * Check if role has a specific permission.
+     *
+     * @param string $permission
+     * @return bool
+     */
+    public function hasPermission(string $permission): bool
+    {
+        return $this->permissions()->where('name', $permission)->exists();
     }
 } 

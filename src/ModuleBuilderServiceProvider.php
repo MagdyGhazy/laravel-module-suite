@@ -41,8 +41,8 @@ class ModuleBuilderServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../database/migrations/2023_10_01_000001_create_roles_table.php' => database_path('migrations/2023_10_01_000001_create_roles_table.php'),
                 __DIR__.'/../database/migrations/2023_10_01_000002_create_permissions_table.php' => database_path('migrations/2023_10_01_000002_create_permissions_table.php'),
-                __DIR__.'/../database/migrations/2023_10_01_000003_create_user_role_table.php' => database_path('migrations/2023_10_01_000003_create_user_role_table.php'),
                 __DIR__.'/../database/migrations/2023_10_01_000004_create_role_permission_table.php' => database_path('migrations/2023_10_01_000004_create_role_permission_table.php'),
+                __DIR__.'/../database/migrations/2023_10_01_000006_create_roleables_table.php' => database_path('migrations/2023_10_01_000006_create_roleables_table.php'),
                 __DIR__.'/../database/migrations/2023_10_01_000005_create_media_table.php' => database_path('migrations/2023_10_01_000005_create_media_table.php'),
             ], 'migrations');
 
@@ -55,6 +55,14 @@ class ModuleBuilderServiceProvider extends ServiceProvider
             // Register seeders in DatabaseSeeder
             $this->registerSeeders();
         }
+
+        // Register media disk configuration
+        $this->app['config']->set('filesystems.disks.media', [
+            'driver' => 'local',
+            'root' => storage_path('app/media'),
+            'url' => env('APP_URL').'/storage/media',
+            'visibility' => 'public',
+        ]);
     }
 
     protected function registerSeeders(): void

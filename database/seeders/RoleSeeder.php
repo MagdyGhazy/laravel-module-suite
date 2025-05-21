@@ -2,21 +2,21 @@
 
 namespace Database\Seeders;
 
-use Ghazym\ModuleBuilder\Models\Role;
-use Ghazym\ModuleBuilder\Models\Permission;
 use Illuminate\Database\Seeder;
 
 class RoleSeeder extends Seeder
 {
     public function run(): void
     {
+        $roleModel = config('module-builder.roles.model');
+        $permissionModel = config('module-builder.permissions.model');
         // Create super admin role
-        $super_admin = Role::create([
-            'name' => 'super Admin',
-            'description' => 'Super Administrator with all permissions'
+        $super_admin = $roleModel::firstOrCreate([
+            'name' => config('module-builder.roles.default_roles.super_admin.name'),
+            'description' => config('module-builder.roles.default_roles.super_admin.description')
         ]);
 
         // Assign all permissions to super admin role
-        $super_admin->syncPermissions(Permission::query()->get()->pluck('id')->toArray());
+        $super_admin->syncPermissions($permissionModel::query()->get()->pluck('id')->toArray());
     }
 } 

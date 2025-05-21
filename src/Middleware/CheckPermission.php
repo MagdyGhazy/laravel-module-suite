@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Ghazym\ModuleBuilder\Traits\ResponseTrait;
+use Ghazym\ModuleBuilder\Traits\HasPermissions;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckPermission
@@ -28,6 +29,10 @@ class CheckPermission
 
         $user = Auth::user();
         
+        if (!in_array(HasPermissions::class, class_uses_recursive($user))) {
+            return $this->errorResponse('User model must use HasPermissions trait', 500);
+        }
+
         if (!$user->hasPermission($permission)) {
             return $this->errorResponse('Forbidden: Insufficient permissions', 403);
         }

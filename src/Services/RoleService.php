@@ -7,17 +7,17 @@ use Ghazym\ModuleBuilder\Models\Permission;
 use Ghazym\ModuleBuilder\Traits\RepositoryTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Str;
 
 class RoleService
 {
     use RepositoryTrait;
 
-    protected Role $model;
+    protected $model;
 
     public function __construct()
     {
-        $this->model = new Role();
+        $modelClass = config('module-builder.roles.model');
+        $this->model = new $modelClass();
     }
 
     /**
@@ -116,7 +116,7 @@ class RoleService
     {
         return $query->where(function (Builder $q) use ($search) {
             $q->where('name', 'LIKE', "%{$search}%")
-              ->orWhere('description', 'LIKE', "%{$search}%");
+            ->orWhere('description', 'LIKE', "%{$search}%");
         });
     }
 
@@ -128,7 +128,8 @@ class RoleService
             'select'    => ['id', 'name', 'description'],
         ];
 
-        $query = $this->query(new Permission(), $parameters);
+        $permissionModelClass = config('module-builder.permissions.model');
+        $query = $this->query(new $permissionModelClass(), $parameters);
 
         if (!empty($search)) {
             $query->where('name', 'LIKE', "%{$search}%");
@@ -141,6 +142,7 @@ class RoleService
 
     public function updatePermission(array $request, int $id)
     {
-        return $this->edit(new Permission(), $request, $id);
+        $permissionModelClass = config('module-builder.permissions.model');
+        return $this->edit(new $permissionModelClass(), $request, $id);
     }
 }
