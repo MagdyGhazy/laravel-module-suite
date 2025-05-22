@@ -1,6 +1,6 @@
 <?php
 
-namespace Ghazym\ModuleBuilder\Requests;
+namespace Ghazym\LaravelModuleSuite\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 

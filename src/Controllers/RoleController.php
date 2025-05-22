@@ -1,13 +1,13 @@
 <?php
 
-namespace Ghazym\ModuleBuilder\Controllers;
+namespace Ghazym\LaravelModuleSuite\Controllers;
 
 use App\Http\Controllers\Controller;
-use Ghazym\ModuleBuilder\Requests\StoreRoleRequest;
-use Ghazym\ModuleBuilder\Requests\UpdateRoleRequest;
-use Ghazym\ModuleBuilder\Requests\UpdatePermissionRequest;
-use Ghazym\ModuleBuilder\Services\RoleService;
-use Ghazym\ModuleBuilder\Traits\ResponseTrait;
+use Ghazym\LaravelModuleSuite\Requests\StoreRoleRequest;
+use Ghazym\LaravelModuleSuite\Requests\UpdateRoleRequest;
+use Ghazym\LaravelModuleSuite\Requests\UpdatePermissionRequest;
+use Ghazym\LaravelModuleSuite\Services\RoleService;
+use Ghazym\LaravelModuleSuite\Traits\ResponseTrait;
 use Illuminate\Http\JsonResponse;
 
 class RoleController extends Controller

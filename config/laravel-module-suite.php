@@ -114,7 +114,7 @@ return [
     |
     */
     'roles' => [
-        'model' => \Ghazym\ModuleBuilder\Models\Role::class,
+        'model' => \Ghazym\LaravelModuleSuite\Models\Role::class,
         'default_roles' => [
             'super_admin' => [
                 'name' => 'Super Admin',
@@ -124,7 +124,7 @@ return [
     ],
 
     'permissions' => [
-        'model' => \Ghazym\ModuleBuilder\Models\Permission::class,
+        'model' => \Ghazym\LaravelModuleSuite\Models\Permission::class,
         'default_permissions' => [
             // User permissions
             'list_users' => [
@@ -191,10 +191,7 @@ return [
     |
     */
     'middleware' => [
-        'permission' => [
-            'name' => 'permission',
-            'class' => \Ghazym\ModuleBuilder\Middleware\CheckPermission::class,
-        ],
+        'class' => \Ghazym\LaravelModuleSuite\Middleware\CheckPermission::class,
     ],
 
     /*

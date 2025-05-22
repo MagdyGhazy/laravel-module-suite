@@ -1,6 +1,6 @@
 <?php
 
-namespace Ghazym\ModuleBuilder\Traits;
+namespace Ghazym\LaravelModuleSuite\Traits;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;

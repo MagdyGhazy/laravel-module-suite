@@ -1,12 +1,13 @@
 <?php
 
-namespace Ghazym\ModuleBuilder\Commands;
+namespace Ghazym\LaravelModuleSuite\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Illuminate\Foundation\Application;
+use Ghazym\LaravelModuleSuite\Services\ModuleService;
 
 class MakeModuleCommand extends Command
 {
@@ -151,8 +152,8 @@ class MakeModuleCommand extends Command
     {
         $date = now()->format('Y-m-d');
         $routePath = base_path('routes/api.php');
-        $authMiddleware = config('module-builder.auth.middleware', 'auth:sanctum');
-        $permissionMiddleware = config('module-builder.middleware.permission.name');
+        $authMiddleware = config('laravel-module-suite.auth.middleware', 'auth:sanctum');
+        $permissionMiddleware = config('laravel-module-suite.middleware.permission.name');
         $routeContent = <<<ROUTE
 
 

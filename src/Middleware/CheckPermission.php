@@ -1,12 +1,12 @@
 <?php
 
-namespace Ghazym\ModuleBuilder\Middleware;
+namespace Ghazym\LaravelModuleSuite\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Ghazym\ModuleBuilder\Traits\ResponseTrait;
-use Ghazym\ModuleBuilder\Traits\HasPermissions;
+use Ghazym\LaravelModuleSuite\Traits\ResponseTrait;
+use Ghazym\LaravelModuleSuite\Traits\HasPermissions;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckPermission

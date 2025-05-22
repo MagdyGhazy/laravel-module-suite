@@ -1,9 +1,9 @@
 <?php
 
-namespace Ghazym\ModuleBuilder\Traits;
+namespace Ghazym\LaravelModuleSuite\Traits;
 
-use Ghazym\ModuleBuilder\Models\Permission;
-use Ghazym\ModuleBuilder\Models\Role;
+use Ghazym\LaravelModuleSuite\Models\Permission;
+use Ghazym\LaravelModuleSuite\Models\Role;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Collection;
 
@@ -14,7 +14,7 @@ trait HasPermissions
      */
     public function roles(): MorphToMany
     {
-        return $this->morphToMany(config('module-builder.roles.model'), 'roleable');
+        return $this->morphToMany(config('laravel-module-suite.roles.model'), 'roleable');
     }
 
     /**

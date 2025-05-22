@@ -10,8 +10,8 @@ class PermissionSeeder extends Seeder
     public function run(): void
     {
         try {
-            $permissionModel = config('module-builder.permissions.model');
-            $defaultPermissions = config('module-builder.permissions.default_permissions', []);
+            $permissionModel = config('laravel-module-suite.permissions.model');
+            $defaultPermissions = config('laravel-module-suite.permissions.default_permissions', []);
 
             foreach ($defaultPermissions as $action) {
                 $permissionModel::firstOrCreate(

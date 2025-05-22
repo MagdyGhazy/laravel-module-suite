@@ -2,7 +2,7 @@
 
 namespace App\Http\Services\{{ name }};
 
-use Ghazym\ModuleBuilder\Traits\RepositoryTrait;
+use Ghazym\LaravelModuleSuite\Traits\RepositoryTrait;
 use App\Models\{{ name }};
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;

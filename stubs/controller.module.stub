@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Api\{{ name }};
+namespace {{ namespace }};
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\{{ name }}\{{ store_request }};
 use App\Http\Requests\{{ name }}\{{ update_request }};
 use App\Http\Services\{{ name }}\{{ service_name }};
-use Ghazym\ModuleBuilder\Traits\ResponseTrait;
+use Ghazym\LaravelModuleSuite\Traits\ResponseTrait;
 use Illuminate\Http\JsonResponse;
 
 class {{ controller_name }} extends Controller

@@ -1,6 +1,6 @@
-# Laravel Module Builder
+# Laravel Module Suite
 
-A Laravel package for custom module building with repository pattern and standardized API responses.
+A comprehensive Laravel package for building modular applications with RBAC, media management, and API endpoints.
 
 ## Prerequisites
 
@@ -20,6 +20,8 @@ php artisan install:api
 - Custom module generation
 - Permission management
 - API endpoints for roles and permissions
+- Repository pattern implementation
+- Standardized API responses
 
 ## Requirements
 
@@ -30,13 +32,13 @@ php artisan install:api
 ## Installation
 
 ```bash
-composer require ghazym/module-builder
+composer require ghazym/laravel-module-suite
 ```
 
 Publish the configuration and migrations:
 
 ```bash
-php artisan vendor:publish --provider="Ghazym\ModuleBuilder\ModuleBuilderServiceProvider"
+php artisan vendor:publish --provider="Ghazym\LaravelModuleSuite\LaravelModuleSuiteServiceProvider"
 ```
 
 Run the migrations:
@@ -77,7 +79,7 @@ This command will create:
 The package provides a polymorphic role system that can be used with any model:
 
 ```php
-use Ghazym\ModuleBuilder\Traits\HasPermissions;
+use Ghazym\LaravelModuleSuite\Traits\HasPermissions;
 
 class User extends Model
 {
@@ -125,7 +127,7 @@ $user->hasAllPermissions(['create user', 'edit user']); // Check if model has al
 The package includes a media management system with automatic file cleanup:
 
 ```php
-use Ghazym\ModuleBuilder\Traits\HasMedia;
+use Ghazym\LaravelModuleSuite\Traits\HasMedia;
 
 class Post extends Model
 {
@@ -159,56 +161,23 @@ $model->removeAllMedia();                    // Remove all media (automatic on m
 
 ### Configuration
 
-The package is highly configurable through the `config/module-builder.php` file:
+The package is highly configurable through the `config/laravel-module-suite.php` file:
 
 ```php
+// Example configuration
 return [
-    // Auth middleware configuration
-    'auth' => [
-        'middleware' => 'auth:sanctum',
-    ],
-
-    // Role and permission settings
-    'roles' => [
-        'model' => \Ghazym\ModuleBuilder\Models\Role::class,
-        'default_roles' => [
-            'super admin' => [
-                'name' => 'Super Admin',
-                'description' => 'Administrator with full access',
-            ],
-        ],
-    ],
-
-    'permissions' => [
-        'model' => \Ghazym\ModuleBuilder\Models\Permission::class,
-        'default_permissions' => [
-            // User permissions
-            'list_users' => [
-                'name' => 'list users',
-                'description' => 'View list of users',
-            ],
-            // ... more permissions
-        ],
-    ],
-
-    // Media settings
     'media' => [
-        'max_size' => 10240, // 10MB
-        'allowed_mimes' => [
-            'image' => ['jpg', 'jpeg', 'png', 'gif'],
-            'document' => ['pdf', 'doc', 'docx'],
-            'video' => ['mp4', 'avi', 'mov'],
-        ],
+        'max_size' => 10 * 1024 * 1024, // 10MB
+        'allowed_mimes' => ['image/jpeg', 'image/png', 'image/gif'],
         'disk' => [
             'default' => 'public',
             'types' => [
                 'image' => 'public',
-                'document' => 'private',
-                'video' => 'public',
+                'document' => 'local',
             ],
         ],
-        'default_folder' => 'media',
     ],
+    // ... other configurations
 ];
 ```
 

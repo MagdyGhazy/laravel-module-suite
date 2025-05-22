@@ -1,6 +1,6 @@
 <?php
 
-namespace Ghazym\ModuleBuilder\Traits;
+namespace Ghazym\LaravelModuleSuite\Traits;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;

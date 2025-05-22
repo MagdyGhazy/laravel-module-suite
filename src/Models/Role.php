@@ -1,14 +1,17 @@
 <?php
 
-namespace Ghazym\ModuleBuilder\Models;
+namespace Ghazym\LaravelModuleSuite\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Collection;
+use Ghazym\LaravelModuleSuite\Traits\HasPermissions;
 
 class Role extends Model
 {
+    use HasPermissions;
+
     protected $fillable = ['name', 'description'];
 
     /**
@@ -16,7 +19,7 @@ class Role extends Model
      */
     public function roleables(): MorphMany
     {
-        return $this->morphMany(config('module-builder.roles.model'), 'roleable');
+        return $this->morphMany(config('laravel-module-suite.roles.model'), 'roleable');
     }
 
     /**
@@ -24,7 +27,7 @@ class Role extends Model
      */
     public function permissions(): BelongsToMany
     {
-        return $this->belongsToMany(config('module-builder.permissions.model'), 'role_permission');
+        return $this->belongsToMany(config('laravel-module-suite.permissions.model'), 'role_permission');
     }
 
     /**

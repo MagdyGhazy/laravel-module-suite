@@ -1,6 +1,6 @@
 <?php
 
-namespace Ghazym\ModuleBuilder\Models;
+namespace Ghazym\LaravelModuleSuite\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;

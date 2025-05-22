@@ -1,6 +1,6 @@
 {
-    "name": "ghazym/module-builder",
-    "description": "A Laravel package for building custom modules with Role-Based Access Control (RBAC) and media management",
+    "name": "ghazym/laravel-module-suite",
+    "description": "A comprehensive Laravel package for building modular applications with RBAC, media management, and API endpoints",
     "type": "library",
     "license": "MIT",
     "version": "1.2.0",
@@ -16,18 +16,18 @@
     },
     "autoload": {
         "psr-4": {
-            "Ghazym\\ModuleBuilder\\": "src/"
+            "Ghazym\\LaravelModuleSuite\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Ghazym\\ModuleBuilder\\Tests\\": "tests/"
+            "Ghazym\\LaravelModuleSuite\\Tests\\": "tests/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Ghazym\\ModuleBuilder\\ModuleBuilderServiceProvider"
+                "Ghazym\\LaravelModuleSuite\\LaravelModuleSuiteServiceProvider"
             ]
         }
     },

@@ -1,11 +1,9 @@
 <?php
 
-namespace Ghazym\ModuleBuilder\Services;
+namespace Ghazym\LaravelModuleSuite\Services;
 
-use Ghazym\ModuleBuilder\Models\Role;
-use Ghazym\ModuleBuilder\Models\Permission;
-use Ghazym\ModuleBuilder\Traits\RepositoryTrait;
-use Illuminate\Database\Eloquent\Builder;
+use Ghazym\LaravelModuleSuite\Models\Role;
+use Ghazym\LaravelModuleSuite\nt\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class RoleService
@@ -16,7 +14,7 @@ class RoleService
 
     public function __construct()
     {
-        $modelClass = config('module-builder.roles.model');
+        $modelClass = config('laravel-module-suite.roles.model');
         $this->model = new $modelClass();
     }
 
@@ -128,7 +126,7 @@ class RoleService
             'select'    => ['id', 'name', 'description'],
         ];
 
-        $permissionModelClass = config('module-builder.permissions.model');
+        $permissionModelClass = config('laravel-module-suite.permissions.model');
         $query = $this->query(new $permissionModelClass(), $parameters);
 
         if (!empty($search)) {
@@ -138,11 +136,9 @@ class RoleService
         return $query->get();
     }
 
-
-
     public function updatePermission(array $request, int $id)
     {
-        $permissionModelClass = config('module-builder.permissions.model');
+        $permissionModelClass = config('laravel-module-suite.permissions.model');
         return $this->edit(new $permissionModelClass(), $request, $id);
     }
 }

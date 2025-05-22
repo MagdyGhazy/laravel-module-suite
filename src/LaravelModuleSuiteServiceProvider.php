@@ -1,19 +1,19 @@
 <?php
 
-namespace Ghazym\ModuleBuilder;
+namespace Ghazym\LaravelModuleSuite;
 
-use Ghazym\ModuleBuilder\Commands\MakeModuleCommand;
-use Ghazym\ModuleBuilder\Middleware\CheckPermission;
+use Ghazym\LaravelModuleSuite\Commands\MakeModuleCommand;
+use Ghazym\LaravelModuleSuite\Middleware\CheckPermission;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 
-class ModuleBuilderServiceProvider extends ServiceProvider
+class LaravelModuleSuiteServiceProvider extends ServiceProvider
 {
     public function register()
     {
         // Merge configuration
-        $this->mergeConfigFrom(__DIR__.'/../config/module-builder.php', 'module-builder');
+        $this->mergeConfigFrom(__DIR__.'/../config/laravel-module-suite.php', 'laravel-module-suite');
     }
 
     public function boot(): void
@@ -34,7 +34,7 @@ class ModuleBuilderServiceProvider extends ServiceProvider
 
             // Publish configuration
             $this->publishes([
-                __DIR__.'/../config/module-builder.php' => config_path('module-builder.php'),
+                __DIR__.'/../config/laravel-module-suite.php' => config_path('laravel-module-suite.php'),
             ], 'config');
 
             // Publish migrations

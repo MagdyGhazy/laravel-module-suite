@@ -1,8 +1,8 @@
 <?php
 
-namespace Ghazym\ModuleBuilder\Traits;
+namespace Ghazym\LaravelModuleSuite\Traits;
 
-use Ghazym\ModuleBuilder\Models\Media;
+use Ghazym\LaravelModuleSuite\Models\Media;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -104,12 +104,12 @@ trait HasMedia
         $fileSize = $file->getSize();
 
         // Check if file type is allowed
-        if (!in_array($mimeType, config('module-builder.media.allowed_mimes'))) {
+        if (!in_array($mimeType, config('laravel-module-suite.media.allowed_mimes'))) {
             return ['error' => 'File type not allowed.'];
         }
 
         // Get max size for this file type or use default
-        $maxSize = config('module-builder.media.max_sizes.' . $mimeType, config('module-builder.media.max_size'));
+        $maxSize = config('laravel-module-suite.media.max_sizes.' . $mimeType, config('laravel-module-suite.media.max_size'));
 
         if ($fileSize > $maxSize) {
             $maxSizeMB = $maxSize / 1024 / 1024;
@@ -324,10 +324,10 @@ trait HasMedia
         };
 
         // Get appropriate disk for file type
-        $disk = config("module-builder.media.disk.types.{$type}", config('module-builder.media.disk.default'));
+        $disk = config("laravel-module-suite.media.disk.types.{$type}", config('laravel-module-suite.media.disk.default'));
 
         return $file->storeAs(
-            config('module-builder.media.default_folder') . '/' . $folder,
+            config('laravel-module-suite.media.default_folder') . '/' . $folder,
             $fileName,
             ['disk' => $disk]
         );
@@ -367,7 +367,7 @@ trait HasMedia
         }
 
         // Get appropriate disk for file type
-        $disk = config("module-builder.media.disk.types.{$type}", config('module-builder.media.disk.default'));
+        $disk = config("laravel-module-suite.media.disk.types.{$type}", config('laravel-module-suite.media.disk.default'));
 
         if (Storage::disk($disk)->exists($filePath)) {
             Storage::disk($disk)->delete($filePath);
