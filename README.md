@@ -1,6 +1,16 @@
 # Laravel Module Builder
 
-A Laravel package for building custom modules with RBAC and media management.
+A Laravel package for custom module building with repository pattern and standardized API responses.
+
+## Prerequisites
+
+Before using this package, ensure you have:
+
+1. Laravel 9.x, 10.x, 11.x, or 12.x installed
+2. For Laravel 11.x or higher, you need to install the API package:
+   ```bash
+   php artisan install:api
+   ```
 
 ## Features
 
@@ -32,6 +42,13 @@ Run the migrations:
 
 ```bash
 php artisan migrate
+```
+
+Seed the default permissions and roles:
+
+```bash
+php artisan db:seed --class=PermissionSeeder
+php artisan db:seed --class=RoleSeeder
 ```
 
 ## Usage
@@ -203,6 +220,10 @@ Route::group(['prefix' => 'role', 'middleware' => 'auth:sanctum'], function () {
 When you run `make:module`, it creates:
 
 ```
+
+## Structure
+
+When you run `make:module`, it creates the following directory structure:
 app/
 ├── Http/
 │   ├── Controllers/
@@ -241,6 +262,16 @@ All API responses follow a consistent format:
     },
     "errors": null
 }
+{
+    "success": false,
+    "message": "Operation Operation failed",
+    "data": null,
+    "errors": {
+        // errors
+    }
+}
+
+
 ```
 
 ## License
