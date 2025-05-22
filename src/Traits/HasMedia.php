@@ -19,7 +19,7 @@ trait HasMedia
     {
         static::deleting(function ($model) {
             // Delete all media files when model is deleted
-           $model->removeAllMedia();
+            $model->removeAllMedia();
         });
     }
 
@@ -58,7 +58,7 @@ trait HasMedia
     /**
      * Add a file to the model.
      *
-     * @return Media|array  
+     * @return Media|array
      */
     public function addMedia(UploadedFile $file, string $name, string $folder): Media|array
     {
@@ -74,7 +74,7 @@ trait HasMedia
             $filePath = $this->storeFile($file, $folder);
 
             if (!$filePath) {
-                return ['error' => 'Failed to store file.'];    
+                return ['error' => 'Failed to store file.'];
             }
 
             $media = $this->media()->create([
@@ -90,7 +90,7 @@ trait HasMedia
         } catch (Exception $e) {
             DB::rollBack();
             // Clean up any uploaded file if database transaction fails
-            $this->deleteFile($filePath ?? null);
+            $this->deleteFile(null, $filePath ?? null);
             return ['error' => $e->getMessage()];
         }
     }
@@ -122,7 +122,7 @@ trait HasMedia
     /**
      * Add multiple files to the model.
      *
-     * @return array  
+     * @return array
      */
     public function addMultipleMedia(array $files, string $name, string $folder): array
     {
@@ -153,7 +153,7 @@ trait HasMedia
     /**
      * Update a media file for the model.
      *
-     * @return Media|array  
+     * @return Media|array
      */
     public function updateMedia(Media $media, UploadedFile $file, string $name, string $folder): Media|array
     {
@@ -162,7 +162,7 @@ trait HasMedia
 
             if ($this->isMediaBelongsToModel($media)) {
                 // Delete old file if it exists
-                $this->deleteFile($media->file_path);
+                $this->deleteFile($media);
 
                 // Store new file
                 $filePath = $this->storeFile($file, $folder);
@@ -189,7 +189,7 @@ trait HasMedia
         } catch (Exception $e) {
             DB::rollBack();
             // Clean up any uploaded file if transaction fails
-            $this->deleteFile($filePath ?? null);
+            $this->deleteFile(null, $filePath ?? null);
             return ['error' => $e->getMessage()];
         }
     }
@@ -197,7 +197,7 @@ trait HasMedia
     /**
      * Update multiple media files for the model.
      *
-     * @return array  
+     * @return array
      */
     public function updateMultipleMedia(array $files, string $name, string $folder): array
     {
@@ -217,7 +217,7 @@ trait HasMedia
                     'file' => $file->getClientOriginalName(),
                     'error' => $media['error']
                 ];
-            }   
+            }
         }
 
         if (!empty($errors)) {
@@ -230,7 +230,7 @@ trait HasMedia
     /**
      * Remove a media from the model.
      *
-     * @return bool|array  
+     * @return bool|array
      */
     public function removeMedia(Media $media): bool|array
     {
@@ -238,10 +238,10 @@ trait HasMedia
             DB::beginTransaction();
 
             if ($this->isMediaBelongsToModel($media)) {
-                
-                $this->deleteFile($media->file_path);
+
+                $this->deleteFile($media);
                 $deleted = $media->delete();
-                
+
                 DB::commit();
                 return $deleted;
             }
@@ -308,11 +308,11 @@ trait HasMedia
 
     /**
      * Store a file in storage.
-     */ 
+     */
     private function storeFile(UploadedFile $file, string $folder): string
     {
         $fileName = 'M-' . Str::random(10) . rand(1000, 9999) . '.' . $file->getClientOriginalExtension();
-        
+
         // Determine file type category
         $mimeType = $file->getMimeType();
         $type = match(true) {
@@ -327,8 +327,8 @@ trait HasMedia
         $disk = config("module-builder.media.disk.types.{$type}", config('module-builder.media.disk.default'));
 
         return $file->storeAs(
-            config('module-builder.media.default_folder') . '/' . $folder, 
-            $fileName, 
+            config('module-builder.media.default_folder') . '/' . $folder,
+            $fileName,
             ['disk' => $disk]
         );
     }
@@ -336,10 +336,41 @@ trait HasMedia
     /**
      * Delete a file from storage.
      */
-    private function deleteFile(?string $filePath): void
+    private function deleteFile(?Media $media = null, ?string $path = null): void
     {
-        if ($filePath && Storage::exists($filePath)) {
-            Storage::delete($filePath);
+        $filePath = $path ?? $media?->file_path;
+
+        if (!$filePath) {
+            return;
+        }
+
+        // If we have a Media model, use its properties
+        if ($media) {
+            $mimeType = $media->mime_type;
+            $type = match(true) {
+                str_starts_with($mimeType, 'image/') => 'image',
+                str_starts_with($mimeType, 'video/') => 'video',
+                str_starts_with($mimeType, 'audio/') => 'audio',
+                str_starts_with($mimeType, 'application/zip') || str_starts_with($mimeType, 'application/x-rar-compressed') => 'archive',
+                default => 'document'
+            };
+        } else {
+            // For direct path deletion, try to determine type from extension
+            $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+            $type = match($extension) {
+                'jpg', 'jpeg', 'png', 'gif', 'webp' => 'image',
+                'mp4', 'mov', 'avi', 'wmv' => 'video',
+                'mp3', 'wav', 'ogg' => 'audio',
+                'zip', 'rar' => 'archive',
+                default => 'document'
+            };
+        }
+
+        // Get appropriate disk for file type
+        $disk = config("module-builder.media.disk.types.{$type}", config('module-builder.media.disk.default'));
+
+        if (Storage::disk($disk)->exists($filePath)) {
+            Storage::disk($disk)->delete($filePath);
         }
     }
 } 

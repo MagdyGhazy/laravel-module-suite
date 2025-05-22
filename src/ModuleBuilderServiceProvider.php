@@ -16,7 +16,7 @@ class ModuleBuilderServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../config/module-builder.php', 'module-builder');
     }
 
-    public function boot()
+    public function boot(): void
     {
         // Register middleware
         $this->app['router']->aliasMiddleware('permission', CheckPermission::class);
@@ -63,6 +63,14 @@ class ModuleBuilderServiceProvider extends ServiceProvider
             'url' => env('APP_URL').'/storage/media',
             'visibility' => 'public',
         ]);
+
+        // Create symbolic link for storage
+        if (!file_exists(public_path('storage'))) {
+            $this->app->make('files')->link(
+                storage_path('app/public'),
+                public_path('storage')
+            );
+        }
     }
 
     protected function registerSeeders(): void
