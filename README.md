@@ -8,9 +8,10 @@ Before using this package, ensure you have:
 
 1. Laravel 9.x, 10.x, 11.x, or 12.x installed
 2. For Laravel 11.x or higher, you need to install the API package:
-   ```bash
-   php artisan install:api
-   ```
+
+```bash
+php artisan install:api
+```
 
 ## Features
 
@@ -50,6 +51,24 @@ Seed the default permissions and roles:
 php artisan db:seed --class=PermissionSeeder
 php artisan db:seed --class=RoleSeeder
 ```
+
+## Module Generation
+
+Generate a new module with all necessary files:
+
+```bash
+php artisan make:module ModuleName
+```
+
+This command will create:
+- Controller with API endpoints
+- Model with relationships
+- Service class for business logic
+- Form Request classes for validation
+- Migration file
+- Seeder file
+- Repository trait for data access
+- Response trait for standardized API responses
 
 ## Usage
 
