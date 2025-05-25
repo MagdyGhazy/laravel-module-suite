@@ -191,7 +191,10 @@ return [
     |
     */
     'middleware' => [
-        'class' => \Ghazym\LaravelModuleSuite\Middleware\CheckPermission::class,
+        'permission' => [
+            'name' => 'permission',
+            'class' => \Ghazym\LaravelModuleSuite\Middleware\CheckPermission::class,
+        ],
     ],
 
     /*

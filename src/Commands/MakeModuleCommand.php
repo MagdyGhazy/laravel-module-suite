@@ -6,8 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
-use Illuminate\Foundation\Application;
-use Ghazym\LaravelModuleSuite\Services\ModuleService;
+
 
 class MakeModuleCommand extends Command
 {
