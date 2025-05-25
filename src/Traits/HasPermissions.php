@@ -2,7 +2,6 @@
 
 namespace Ghazym\LaravelModuleSuite\Traits;
 
-use Ghazym\LaravelModuleSuite\Models\Permission;
 use Ghazym\LaravelModuleSuite\Models\Role;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Collection;
@@ -26,11 +25,15 @@ trait HasPermissions
     public function assignRole($role): bool|array
     {
         try {
+
+            $modelClass = config('laravel-module-suite.roles.model');
+            $roleModel = new $modelClass();
+
             if (is_string($role)) {
-                $role = Role::where('name', $role)->firstOrFail();
+                $role = $roleModel->where('name', $role)->firstOrFail();
             } elseif (is_int($role)) {
-                $role = Role::findOrFail($role);
-            } elseif (!$role instanceof Role) {
+                $role = $roleModel->findOrFail($role);
+            } elseif (!$role instanceof $modelClass) {
                 return ['error' => 'Role must be an ID, name, or Role model instance'];
             }
 
@@ -51,11 +54,14 @@ trait HasPermissions
     public function removeRole($role): bool|array
     {
         try {
+            $modelClass = config('laravel-module-suite.roles.model');
+            $roleModel = new $modelClass();
+
             if (is_string($role)) {
-                $role = Role::where('name', $role)->firstOrFail();
+                $role = $roleModel->where('name', $role)->firstOrFail();
             } elseif (is_int($role)) {
-                $role = Role::findOrFail($role);
-            } elseif (!$role instanceof Role) {
+                $role = $roleModel->findOrFail($role);
+            } elseif (!$role instanceof $modelClass) {
                 return ['error' => 'Role must be an ID, name, or Role model instance'];
             }
 
