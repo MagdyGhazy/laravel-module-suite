@@ -1,6 +1,6 @@
 <?php
 
-namespace {{ namespace }};
+namespace App\Http\Controllers\Api\{{ name }};
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\{{ name }}\{{ store_request }};
