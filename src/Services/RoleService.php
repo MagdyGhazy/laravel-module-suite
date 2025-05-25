@@ -3,7 +3,8 @@
 namespace Ghazym\LaravelModuleSuite\Services;
 
 use Ghazym\LaravelModuleSuite\Models\Role;
-use Ghazym\LaravelModuleSuite\nt\Builder;
+use Ghazym\LaravelModuleSuite\Traits\RepositoryTrait;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class RoleService
