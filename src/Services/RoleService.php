@@ -2,9 +2,9 @@
 
 namespace Ghazym\LaravelModuleSuite\Services;
 
-use Ghazym\LaravelModuleSuite\Models\Role;
 use Ghazym\LaravelModuleSuite\Traits\RepositoryTrait;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class RoleService
@@ -31,13 +31,10 @@ class RoleService
 
         $parameters = [
             'select' => ['id', 'name'],
+            'search' => $search ? ['search' => $search , 'columns' => ['name']] : null,
         ];
 
         $query = $this->query($this->model, $parameters);
-
-        if ($search) {
-            $query = $this->search($query, $search);
-        }
 
         return $query->paginate($perPage);
     }
@@ -46,9 +43,9 @@ class RoleService
      * Get single role by ID
      *
      * @param int $id
-     * @return Role|array|null
+     * @return Model|array|null
      */
-    public function show(int $id): Role|array|null
+    public function show(int $id): Model|array|null
     {
         $parameters = [
             'select' => ['id', 'name'],
@@ -62,9 +59,9 @@ class RoleService
      * Create new role
      *
      * @param array $request
-     * @return Role|array
+     * @return Model|array
      */
-    public function store(array $request): Role|array
+    public function store(array $request): Model|array
     {
         $role = $this->create($this->model, $request);
 
@@ -80,9 +77,9 @@ class RoleService
      *
      * @param array $request
      * @param int $id
-     * @return Role|array|null
+     * @return Model|array|null
      */
-    public function update(array $request, int $id): Role|array|null
+    public function update(array $request, int $id): Model|array|null
     {
         $role = $this->edit($this->model, $request, $id);
 
@@ -105,39 +102,32 @@ class RoleService
     }
 
     /**
-     * Filter query by search term
+     * Get all permissions
      *
-     * @param Builder $query
-     * @param string $search
-     * @return Builder
+     * @return Collection|array
      */
-    protected function search(Builder $query, string $search): Builder
-    {
-        return $query->where(function (Builder $q) use ($search) {
-            $q->where('name', 'LIKE', "%{$search}%")
-            ->orWhere('description', 'LIKE', "%{$search}%");
-        });
-    }
 
-    public function allPermissions()
+    public function allPermissions(): Collection|array
     {
         $search = request()->get('search');
 
         $parameters = [
             'select'    => ['id', 'name', 'description'],
+            'search' => $search ? ['search' => $search , 'columns' => ['name', 'description']] : null,
         ];
 
         $permissionModelClass = config('laravel-module-suite.permissions.model');
-        $query = $this->query(new $permissionModelClass(), $parameters);
-
-        if (!empty($search)) {
-            $query->where('name', 'LIKE', "%{$search}%");
-        }
-
-        return $query->get();
+        return $this->getAll(new $permissionModelClass(), $parameters);
     }
 
-    public function updatePermission(array $request, int $id)
+    /**
+     * Update existing Permission
+     *
+     * @param array $request
+     * @param int $id
+     * @return Model|array|null
+     */
+    public function updatePermission(array $request, int $id): Model|array|null
     {
         $permissionModelClass = config('laravel-module-suite.permissions.model');
         return $this->edit(new $permissionModelClass(), $request, $id);

@@ -33,14 +33,11 @@ class {{ service_name }}
 //            'relations' => ['test:id,column'],
 //            'where' => [
 //                 ['column', '=', 'value'],
-//            ]
+//            ],
+            'search' => $search ? ['search' => $search , 'columns' => ['id', 'column']] : null,
         ];
 
         $query = $this->query($this->model, $parameters);
-
-        if ($search) {
-            $query = $this->search($query, $search);
-        }
 
         return $query->paginate($perPage);
     }
@@ -96,20 +93,5 @@ class {{ service_name }}
     public function destroy(int $id): bool|array
     {
         return $this->delete($this->model, $id);
-    }
-
-    /**
-     * Filter query by search term
-     *
-     * @param Builder $query
-     * @param string $search
-     * @return Builder
-     */
-    protected function search(Builder $query, string $search): Builder
-    {
-        return $query->where(function (Builder $q) use ($search) {
-            $q->where('id', 'LIKE', "%{$search}%");
-            // $q->orWhere('column', 'LIKE', "%{$search}%");
-        });
     }
 }

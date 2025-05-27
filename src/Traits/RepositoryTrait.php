@@ -34,6 +34,23 @@ trait RepositoryTrait
                 }
             });
 
+
+            $query->when(!empty($parameters['search']) && is_array($parameters['search']), function ($query) use ($parameters) {
+                $searchTerm = $parameters['search']['search'];
+                $columns = $parameters['search']['columns'];
+
+                if (method_exists($query, 'whereAny')) {
+                    $query->whereAny($columns, 'LIKE', "%{$searchTerm}%");
+                } else {
+                    // Fallback for older Laravel versions
+                    $query->where(function (Builder $q) use ($searchTerm, $columns) {
+                        foreach ($columns as $column) {
+                            $q->orWhere($column, 'LIKE', "%{$searchTerm}%");
+                        }
+                    });
+                }
+            });
+
             $query->orderBy('created_at', 'desc');
 
             return $query;
