@@ -15,9 +15,28 @@ class Media extends Model
         'mime_type',
     ];
 
+    protected $appends = ['url'];
+
+
+    protected $hidden = [
+        'mediable_type',
+        'mediable_id',
+        'file_path',
+    ];
+
     protected $casts = [
         'file_size' => 'integer',
     ];
+
+    public function getUrlAttribute()
+    {
+        $env = env('APP_ENV');
+        if ($env == 'local') {
+            return $this->path ? url($this->path) : null;
+        }else{
+            return $this->path ? url('storage/' . $this->path) : null;
+        }
+    }
 
     /**
      * Get the parent mediable model.
