@@ -32,9 +32,9 @@ class Media extends Model
     {
         $env = env('APP_ENV');
         if ($env == 'local') {
-            return $this->path ? url($this->path) : null;
+            return $this->file_path ? url($this->file_path) : null;
         }else{
-            return $this->path ? url('storage/' . $this->path) : null;
+            return $this->file_path ? url('storage/' . $this->file_path) : null;
         }
     }
 
