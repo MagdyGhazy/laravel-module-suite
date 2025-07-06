@@ -3,7 +3,7 @@
     "description": "A comprehensive Laravel package for building modular applications with RBAC, media management, and API endpoints",
     "type": "library",
     "license": "MIT",
-    "version": "1.2.6",
+    "version": "1.2.7",
     "authors": [
         {
             "name": "Magdy Ghazy",

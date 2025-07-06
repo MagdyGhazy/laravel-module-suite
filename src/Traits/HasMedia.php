@@ -29,7 +29,7 @@ trait HasMedia
      */
     public function media(): MorphMany
     {
-        return $this->morphMany(config('laravel-module-suite.roles.model'), 'mediable');
+        return $this->morphMany(config('laravel-module-suite.media.model', Media::class), 'mediable');
     }
 
     /**
