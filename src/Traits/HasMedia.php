@@ -3,6 +3,7 @@
 namespace Ghazym\LaravelModuleSuite\Traits;
 
 use Ghazym\LaravelModuleSuite\Models\Media;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -28,7 +29,7 @@ trait HasMedia
      */
     public function media(): MorphMany
     {
-        return $this->morphMany(Media::class, 'mediable');
+        return $this->morphMany(config('laravel-module-suite.roles.model'), 'mediable');
     }
 
     /**
@@ -42,7 +43,7 @@ trait HasMedia
     /**
      * Get the first media from a collection.
      */
-    public function getFirstMedia(string $name): ?Media
+    public function getFirstMedia(string $name): ?Model
     {
         return $this->getMedia($name)->first();
     }
@@ -50,7 +51,7 @@ trait HasMedia
     /**
      * Get the last media from a collection.
      */
-    public function getLastMedia(string $name): ?Media
+    public function getLastMedia(string $name): ?Model
     {
         return $this->getMedia($name)->latest()->first();
     }
@@ -58,9 +59,9 @@ trait HasMedia
     /**
      * Add a file to the model.
      *
-     * @return Media|array
+     * @return Model|array
      */
-    public function addMedia(UploadedFile $file, string $name, string $folder): Media|array
+    public function addMedia(UploadedFile $file, string $name, string $folder): Model|array
     {
         try {
             // Validate file
@@ -153,9 +154,10 @@ trait HasMedia
     /**
      * Update a media file for the model.
      *
-     * @return Media|array
+     * @return Model|array
+     *
      */
-    public function updateMedia(Media $media, UploadedFile $file, string $name, string $folder): Media|array
+    public function updateMedia(Model $media, UploadedFile $file, string $name, string $folder): Model|array
     {
         try {
             DB::beginTransaction();
@@ -232,7 +234,7 @@ trait HasMedia
      *
      * @return bool|array
      */
-    public function removeMedia(Media $media): bool|array
+    public function removeMedia(Model $media): bool|array
     {
         try {
             DB::beginTransaction();
@@ -264,7 +266,7 @@ trait HasMedia
         try {
             DB::beginTransaction();
 
-            $this->getMedia($name)->each(function (Media $media) {
+            $this->getMedia($name)->each(function (Model $media) {
                 $this->removeMedia($media);
             });
 
@@ -286,7 +288,7 @@ trait HasMedia
         try {
             DB::beginTransaction();
 
-            $this->media()->each(function (Media $media) {
+            $this->media()->each(function (Model $media) {
                 $this->removeMedia($media);
             });
 
@@ -301,7 +303,7 @@ trait HasMedia
     /**
      * Check if media belongs to the model.
      */
-    private function isMediaBelongsToModel(Media $media): bool
+    private function isMediaBelongsToModel(Model $media): bool
     {
         return $media->mediable_id === $this->id && $media->mediable_type === get_class($this);
     }
@@ -336,7 +338,7 @@ trait HasMedia
     /**
      * Delete a file from storage.
      */
-    private function deleteFile(?Media $media = null, ?string $path = null): void
+    private function deleteFile(?Model $media = null, ?string $path = null): void
     {
         $filePath = $path ?? $media?->file_path;
 

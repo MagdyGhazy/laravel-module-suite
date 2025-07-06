@@ -16,6 +16,7 @@ return [
     |--------------------------------------------------------------------------
     */
     'media' => [
+        'model' => \Ghazym\LaravelModuleSuite\Models\Media::class,
         // Default maximum file size in bytes (10MB)
         'max_size' => 10 * 1024 * 1024,
 
