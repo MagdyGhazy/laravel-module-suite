@@ -2,7 +2,6 @@
 
 namespace Ghazym\LaravelModuleSuite\Traits;
 
-use Ghazym\LaravelModuleSuite\Models\Media;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Http\UploadedFile;
@@ -29,7 +28,7 @@ trait HasMedia
      */
     public function media(): MorphMany
     {
-        return $this->morphMany(config('laravel-module-suite.media.model', Media::class), 'mediable');
+        return $this->morphMany(config('laravel-module-suite.media.model', config('laravel-module-suite.media.model')), 'mediable');
     }
 
     /**
