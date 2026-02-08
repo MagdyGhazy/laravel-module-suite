@@ -67,6 +67,7 @@ This command will create:
 - Model with relationships
 - Service class for business logic
 - Form Request classes for validation
+- API Resource for handling list and detail views
 - Migration file
 - Seeder file
 - Repository trait for data access
@@ -151,7 +152,7 @@ $model->getLastMedia('licence_images');      // Get last media
 
 // Update media
 $model->updateMedia($media, $newFile, $name, $folder);
-$model->updateMultipleMedia($files, $name, $folder);
+$model->updateMultipleMedia($files, $name, $folder, $keepMediaIds);
 
 // Remove media
 $model->removeMedia($media);                 // Remove single media
@@ -222,6 +223,9 @@ app/
 │   │   └── ModuleName/
 │   │       ├── StoreModuleNameRequest.php
 │   │       └── UpdateModuleNameRequest.php
+|   ├── Resources/
+│   │   └── ModuleName/
+│   │       └── ModuleNameResource.php
 │   ├── Services/
 │   │   └── ModuleName/
 │   │       └── ModuleNameService.php
