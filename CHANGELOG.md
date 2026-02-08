@@ -21,6 +21,11 @@ All notable changes to this project will be documented in this file.
 - Resource Implementation: Generated Resources now require listFormat() and showFormat() methods to function with the new dual-mode logic.
 - Pagination Key: Pagination data has moved from being inside the data object to a top-level pagination key in the JSON response.
 
+## [2.0.1] - 2025-02-08
+
+### Changed
+- Updated PHP version requirement to minimum 8.1 (removed PHP 8.0 support)
+
 ## [1.2.0] - 2024-03-19
 
 ### Added
