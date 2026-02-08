@@ -29,8 +29,7 @@ class {{ controller_name }} extends Controller
      */
     public function index(): JsonResponse
     {
-        $data = $this->service->index();
-        return !isset($data['error']) ? $this->successResponse($data, 'All ' . $this->key . 's retrieved successfully') : $this->errorResponse('Cannot fetch ' . $this->key . 's', 404, $data['error']);
+        return $this->handleServiceResponse($this->service->index());
     }
 
     /**
@@ -41,8 +40,7 @@ class {{ controller_name }} extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        $data = $this->service->show($id);
-        return !isset($data['error']) ? $this->successResponse($data, $this->key . ' details retrieved successfully') : $this->notFoundResponse('Cannot fetch ' . $this->key);
+        return $this->handleServiceResponse($this->service->show($id));
     }
 
     /**
@@ -53,8 +51,7 @@ class {{ controller_name }} extends Controller
      */
     public function store({{ store_request }} $request): JsonResponse
     {
-        $data = $this->service->store($request->validated());
-        return !isset($data['error']) ? $this->successResponse($data, $this->key . ' created successfully', 201) : $this->errorResponse('Cannot create ' . $this->key, 400, $data['error']);
+        return $this->handleServiceResponse($this->service->store($request->validated()));
     }
 
     /**
@@ -66,8 +63,7 @@ class {{ controller_name }} extends Controller
      */
     public function update({{ update_request }} $request, int $id): JsonResponse
     {
-        $data = $this->service->update($request->validated(), $id);
-        return !isset($data['error']) ? $this->successResponse($data, $this->key . ' updated successfully') : $this->errorResponse('Cannot update ' . $this->key, 400, $data['error']);
+        return $this->handleServiceResponse($this->service->update($request->validated(), $id));
     }
 
     /**
@@ -78,7 +74,6 @@ class {{ controller_name }} extends Controller
      */
     public function destroy(int $id): JsonResponse
     {
-        $data = $this->service->destroy($id);
-        return !isset($data['error']) ? $this->successResponse($data, $this->key . ' deleted successfully') : $this->errorResponse('Cannot delete ' . $this->key, 400, $data['error']);
+        return $this->handleServiceResponse($this->service->destroy($id));
     }
 }

@@ -55,14 +55,15 @@ class MakeModuleCommand extends Command
         $small_plural_name = Str::plural($small_name);
         
         $this->names = [
-            'name' => $name,
-            'small_name' => $small_name,
-            'class_name' => $name . 'Service',
-            'controller_name' => $name . 'Controller',
-            'seeder_name' => $name . 'Seeder',
-            'store_request' => 'Store' . $name . 'Request',
-            'update_request' => 'Update' . $name . 'Request',
-            'plural_name' => $plural_name,
+            'name'              => $name,
+            'small_name'        => $small_name,
+            'class_name'        => $name . 'Service',
+            'resource_name'     => $name . 'Resource',
+            'controller_name'   => $name . 'Controller',
+            'seeder_name'       => $name . 'Seeder',
+            'store_request'     => 'Store' . $name . 'Request',
+            'update_request'    => 'Update' . $name . 'Request',
+            'plural_name'       => $plural_name,
             'small_plural_name' => $small_plural_name,
         ];
     }
@@ -70,12 +71,13 @@ class MakeModuleCommand extends Command
     protected function initializePaths(): void
     {
         $this->paths = [
-            'service_directory' => app_path("Http/Services/{$this->names['name']}"),
-            'service_path' => app_path("Http/Services/{$this->names['name']}/{$this->names['class_name']}.php"),
-            'controller_directory' => app_path("Http/Controllers/Api/{$this->names['name']}"),
-            'controller_path' => app_path("Http/Controllers/Api/{$this->names['name']}/{$this->names['controller_name']}.php"),
-            'service_stub' => __DIR__ . '/../../stubs/service.stub',
-            'controller_stub' => __DIR__ . '/../../stubs/controller.module.stub',
+            'service_directory'     => app_path("Http/Services/{$this->names['name']}"),
+            'service_path'          => app_path("Http/Services/{$this->names['name']}/{$this->names['class_name']}.php"),
+            'controller_directory'  => app_path("Http/Controllers/Api/{$this->names['name']}"),
+            'controller_path'       => app_path("Http/Controllers/Api/{$this->names['name']}/{$this->names['controller_name']}.php"),
+            'service_stub'          => __DIR__ . '/../../stubs/service.stub',
+            'controller_stub'       => __DIR__ . '/../../stubs/controller.module.stub',
+            'resource_path'         => app_path("Http/Resources/{$this->names['name']}/{$this->names['name']}Resource.php"),
         ];
     }
 
@@ -121,6 +123,7 @@ class MakeModuleCommand extends Command
         Artisan::call("make:request", ['name' => "{$this->names['name']}/{$this->names['store_request']}"]);
         Artisan::call("make:request", ['name' => "{$this->names['name']}/{$this->names['update_request']}"]);
         Artisan::call("make:seeder", ['name' => "{$this->names['seeder_name']}"]);
+        Artisan::call("make:resource", ['name' => "{$this->names['name']}/{$this->names['resource_name']}"]);
     }
 
     protected function generateServiceAndController(): void
@@ -139,6 +142,7 @@ class MakeModuleCommand extends Command
         $replacements = [
             '{{ name }}' => $this->names['name'],
             '{{ service_name }}' => $this->names['class_name'],
+            '{{ resource_name }}' => $this->names['resource_name'],
             '{{ controller_name }}' => $this->names['controller_name'],
             '{{ store_request }}' => $this->names['store_request'],
             '{{ update_request }}' => $this->names['update_request'],
@@ -175,7 +179,7 @@ class MakeModuleCommand extends Command
     protected function updatePermissionSeeder(): void
     {
         $seederPath = database_path('seeders/PermissionSeeder.php');
-        $permissionLine = "            '{$this->names['small_plural_name']}' => ['list', 'show', 'create', 'edit', 'delete'],\n        ";
+        $permissionLine = "                '{$this->names['small_plural_name']}' => ['list', 'show', 'create', 'edit', 'delete'],\n            ";
 
         if (File::exists($seederPath)) {
             $seederContent = File::get($seederPath);

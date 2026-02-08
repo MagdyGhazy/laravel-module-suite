@@ -94,11 +94,9 @@ trait RepositoryTrait
     public function getOne(Model $model, int $id, array $parameters = []): Model|array|null
     {
         $data = $model->find($id);
-
         if (!$data) {
-            return ['error' => 'Data not exists'];
+            return ['error' => 'Resource not found', 'code' => 404];
         }
-
         return $this->buildQuery($model->query(), $parameters)->find($id);
     }
 
@@ -130,11 +128,9 @@ trait RepositoryTrait
     {
         try {
             $data = $model->find($id);
-
             if (!$data) {
-                return ['error' => 'Data not exists'];
+                return ['error' => 'Resource not found', 'code' => 404];
             }
-
             $data->update($request);
             return $data;
         } catch (\Throwable $e) {
@@ -155,7 +151,7 @@ trait RepositoryTrait
             $data = $model->find($id);
 
             if (!$data) {
-                return ['error' => 'Data not exists'];
+                return ['error' => 'Resource not found', 'code' => 404];
             }
 
             return $model->destroy($id);
@@ -172,6 +168,6 @@ trait RepositoryTrait
      */
     private function handleError(\Throwable $e): array
     {
-        return ['error' => $e->getMessage()];
+        return ['error' => $e->getMessage(), 'code' => 500];
     }
 } 

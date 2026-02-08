@@ -1,7 +1,6 @@
 <?php
 
 use Ghazym\LaravelModuleSuite\Controllers\RoleController;
-use Ghazym\LaravelModuleSuite\Middleware\CheckPermission;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'role', 'middleware' => config('laravel-module-suite.auth.middleware')], function () {

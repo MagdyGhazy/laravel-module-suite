@@ -196,36 +196,37 @@ trait HasMedia
     }
 
     /**
-     * Update multiple media files for the model.
+     * Sync media files: Keep specified ones and add new ones.
      *
+     * @param array $files
+     * @param string $name
+     * @param string $folder
+     * @param array $keepMediaIds
      * @return array
      */
-    public function updateMultipleMedia(array $files, string $name, string $folder): array
+    public function updateMultipleMedia(array $files, string $name, string $folder, array $keepMediaIds = []): array
     {
-        $allMedia = [];
-        $errors = [];
+        try {
+            DB::beginTransaction();
 
-        $this->removeMultipleMedia($name);
+            $currentMedia = $this->getMedia($name);
 
-        foreach ($files as $file) {
+            $currentMedia->whereNotIn('id', $keepMediaIds)->get()->each(function ($media) {
+                $this->removeMedia($media);
+            });
 
-            $media = $this->addMedia($file, $name, $folder);
-
-            if ($media) {
-                $allMedia[] = $media;
-            } else {
-                $errors[] = [
-                    'file' => $file->getClientOriginalName(),
-                    'error' => $media['error']
-                ];
+            if (!empty($files)) {
+                $this->addMultipleMedia($files, $name, $folder);
             }
-        }
 
-        if (!empty($errors)) {
-            return ['error' => 'Some files failed to update: ' . json_encode($errors)];
-        }
+            DB::commit();
 
-        return $allMedia;
+            return $this->getMedia($name)->get()->toArray();
+
+        } catch (Exception $e) {
+            DB::rollBack();
+            return ['error' => $e->getMessage()];
+        }
     }
 
     /**
@@ -345,7 +346,6 @@ trait HasMedia
             return;
         }
 
-        // If we have a Media model, use its properties
         if ($media) {
             $mimeType = $media->mime_type;
             $type = match(true) {
@@ -356,7 +356,6 @@ trait HasMedia
                 default => 'document'
             };
         } else {
-            // For direct path deletion, try to determine type from extension
             $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
             $type = match($extension) {
                 'jpg', 'jpeg', 'png', 'gif', 'webp' => 'image',
@@ -367,7 +366,6 @@ trait HasMedia
             };
         }
 
-        // Get appropriate disk for file type
         $disk = config("laravel-module-suite.media.disk.types.{$type}", config('laravel-module-suite.media.disk.default'));
 
         if (Storage::disk($disk)->exists($filePath)) {

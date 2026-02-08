@@ -2,13 +2,35 @@
 
 namespace Ghazym\LaravelModuleSuite\Traits;
 
+use Ghazym\LaravelModuleSuite\Services\ServiceResponse;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 trait ResponseTrait
 {
+    /**
+     * Handel incoming response
+     *
+     * @param mixed $response
+     */
+    protected function handleServiceResponse(ServiceResponse $response): \Illuminate\Http\JsonResponse
+    {
+        if ($response->status >= 200 && $response->status < 300) {
+            return $this->successResponse($response->data, $response->message ?? 'Success', $response->status);
+        }
+
+        return match ($response->status) {
+            401 => $this->unauthorizedResponse($response->message),
+            403 => $this->forbiddenResponse($response->message),
+            404 => $this->notFoundResponse($response->message),
+            422 => $this->validationErrorResponse($response->errors, $response->message),
+            default => $this->errorResponse($response->message, $response->status, $response->errors),
+        };
+    }
+
     /**
      * Return success response
      *
@@ -22,27 +44,38 @@ trait ResponseTrait
         $response = [
             'success' => true,
             'message' => $message,
-            'data' => $data
         ];
 
-        if ($data instanceof LengthAwarePaginator) {
+        if ($data instanceof JsonResource || $data instanceof AnonymousResourceCollection) {
+
+            $resourceData = $data->response()->getData(true);
+            $response['data'] = $resourceData['data'];
+
+            if (isset($resourceData['meta'])) {
+                $response['pagination'] = [
+                    'total'        => $resourceData['meta']['total'] ?? 0,
+                    'per_page'     => $resourceData['meta']['per_page'] ?? 0,
+                    'current_page' => $resourceData['meta']['current_page'] ?? 0,
+                    'last_page'    => $resourceData['meta']['last_page'] ?? 0,
+                    'from'         => $resourceData['meta']['from'] ?? 0,
+                    'to'           => $resourceData['meta']['to'] ?? 0,
+                ];
+            }
+        }
+        elseif ($data instanceof \Illuminate\Pagination\LengthAwarePaginator) {
             $response['data'] = $data->items();
             $response['pagination'] = [
-                'total' => $data->total(),
-                'per_page' => $data->perPage(),
+                'total'        => $data->total(),
+                'per_page'     => $data->perPage(),
                 'current_page' => $data->currentPage(),
-                'last_page' => $data->lastPage(),
-                'from' => $data->firstItem(),
-                'to' => $data->lastItem()
+                'last_page'    => $data->lastPage(),
+                'from'         => $data->firstItem(),
+                'to'           => $data->lastItem()
             ];
         }
 
-        if ($data instanceof JsonResource) {
-            $response['data'] = $data->response()->getData(true)['data'];
-        }
-
-        if ($data instanceof ResourceCollection) {
-            $response['data'] = $data->response()->getData(true)['data'];
+        else {
+            $response['data'] = $data;
         }
 
         return response()->json($response, $statusCode);
@@ -56,7 +89,7 @@ trait ResponseTrait
      * @param mixed $errors
      * @return JsonResponse
      */
-    protected function errorResponse(string $message, int $statusCode = 400, mixed $errors = null): JsonResponse
+    protected function errorResponse(string $message, int $statusCode = 500, mixed $errors = null): JsonResponse
     {
         $response = [
             'success' => false,
