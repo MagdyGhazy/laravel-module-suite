@@ -21,6 +21,11 @@ All notable changes to this project will be documented in this file.
 - Resource Implementation: Generated Resources now require listFormat() and showFormat() methods to function with the new dual-mode logic.
 - Pagination Key: Pagination data has moved from being inside the data object to a top-level pagination key in the JSON response.
 
+## [2.0.2] - 2026-02-27
+
+### Changed
+- Bumped package version for new release
+
 ## [2.0.1] - 2025-02-08
 
 ### Changed
