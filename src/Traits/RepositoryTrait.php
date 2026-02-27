@@ -15,7 +15,7 @@ trait RepositoryTrait
      * @param array $parameters
      * @return Builder|array
      */
-    private function buildQuery(Builder $query, array $parameters = []): Builder|array
+    protected function buildQuery(Builder $query, array $parameters = []): Builder|array
     {
         try {
             $query->when(!empty($parameters['select']), function ($query) use ($parameters) {
@@ -166,7 +166,7 @@ trait RepositoryTrait
      * @param \Throwable $e
      * @return array
      */
-    private function handleError(\Throwable $e): array
+    protected function handleError(\Throwable $e): array
     {
         return ['error' => $e->getMessage(), 'code' => 500];
     }

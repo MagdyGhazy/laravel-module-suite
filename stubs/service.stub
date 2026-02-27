@@ -24,7 +24,7 @@ class {{ service_name }}
      * Get paginated list of records
      *
      * @return ServiceResponse
-     */
+    */
     public function index(): ServiceResponse
     {
         $search  = request()->get('search');
@@ -49,7 +49,7 @@ class {{ service_name }}
      *
      * @param int $id
      * @return ServiceResponse
-     */
+    */
     public function show(int $id): ServiceResponse
     {
         $parameters = [
@@ -68,7 +68,7 @@ class {{ service_name }}
      *
      * @param array $request
      * @return ServiceResponse
-     */
+    */
     public function store(array $request): ServiceResponse
     {
         return $this->wrap($this->create($this->model, $request), 'Created successfully', 201);
@@ -80,7 +80,7 @@ class {{ service_name }}
      * @param array $request
      * @param int $id
      * @return ServiceResponse
-     */
+    */
     public function update(array $request, int $id): ServiceResponse
     {
         return $this->wrap($this->edit($this->model, $request, $id), 'Updated successfully');
@@ -91,7 +91,7 @@ class {{ service_name }}
      *
      * @param int $id
      * @return ServiceResponse
-     */
+    */
     public function destroy(int $id): ServiceResponse
     {
         $data = $this->delete($this->model, $id);
@@ -101,15 +101,15 @@ class {{ service_name }}
         return ServiceResponse::success($data, 'Deleted successfully');
     }
 
-     /**
-      * Handel output
-      *
-      * @param mixed $result
-      * @param string $successMsg
-      * @param int $successCode
-      * @return ServiceResponse
-      */
-    private function wrap($result, $successMsg = 'Success', $successCode = 200): ServiceResponse
+    /**
+     * Handel output
+     *
+     * @param mixed $result
+     * @param string $successMsg
+     * @param int $successCode
+     * @return ServiceResponse
+    */
+    protected function wrap($result, $successMsg = 'Success', $successCode = 200): ServiceResponse
     {
         if (is_array($result) && isset($result['error'])) {
             return ServiceResponse::error($result['error'], $result['code'] ?? 400);

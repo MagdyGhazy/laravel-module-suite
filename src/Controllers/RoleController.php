@@ -24,75 +24,68 @@ class RoleController extends Controller
     }
 
     /**
-     * Display a listing of roles.
+     * Display a listing of the resource.
      *
      * @return JsonResponse
      */
     public function index(): JsonResponse
     {
-        $data = $this->service->index();
-        return !isset($data['error']) ? $this->successResponse($data, 'All ' . $this->key . 's retrieved successfully') : $this->errorResponse('Cannot fetch ' . $this->key . 's', 404, $data['error']);
+        return $this->handleServiceResponse($this->service->index());
     }
 
     /**
-     * Display the specified role.
+     * Display the specified resource.
      *
      * @param int $id
      * @return JsonResponse
-     */
+    */
     public function show(int $id): JsonResponse
     {
-        $data = $this->service->show($id);
-        return !isset($data['error']) ? $this->successResponse($data, $this->key . ' details retrieved successfully') : $this->notFoundResponse('Cannot fetch ' . $this->key);
+        return $this->handleServiceResponse($this->service->show($id));
     }
 
     /**
-     * Store a newly created role.
+     * Store a newly created resource in storage.
      *
-     * @param StoreRoleRequest $request
+     * @param {{ store_request }} $request
      * @return JsonResponse
-     */
+    */
     public function store(StoreRoleRequest $request): JsonResponse
     {
-        $data = $this->service->store($request->validated());
-        return !isset($data['error']) ? $this->successResponse($data, $this->key . ' created successfully', 201) : $this->errorResponse('Cannot create ' . $this->key, 400, $data['error']);
+        return $this->handleServiceResponse($this->service->store($request->validated()));
     }
 
     /**
-     * Update the specified role.
+     * Update the specified resource in storage.
      *
-     * @param UpdateRoleRequest $request
+     * @param {{ update_request }} $request
      * @param int $id
      * @return JsonResponse
-     */
+    */
     public function update(UpdateRoleRequest $request, int $id): JsonResponse
     {
-        $data = $this->service->update($request->validated(), $id);
-        return !isset($data['error']) ? $this->successResponse($data, $this->key . ' updated successfully') : $this->errorResponse('Cannot update ' . $this->key, 400, $data['error']);
+        return $this->handleServiceResponse($this->service->update($request->validated(), $id));
     }
 
     /**
-     * Remove the specified role.
+     * Remove the specified resource from storage.
      *
      * @param int $id
      * @return JsonResponse
-     */
+    */
     public function destroy(int $id): JsonResponse
     {
-        $data = $this->service->destroy($id);
-        return !isset($data['error']) ? $this->successResponse($data, $this->key . ' deleted successfully') : $this->errorResponse('Cannot delete ' . $this->key, 400, $data['error']);
+        return $this->handleServiceResponse($this->service->destroy($id));
     }
 
     public function allPermissions()
     {
-        $data = $this->service->allPermissions();
-        return !isset($data['error']) ? $this->successResponse($data, 'All Permissions') : $this->errorResponse( 404, 'Cannot fetch Permissions', $data['error']);
+        return $this->handleServiceResponse($this->service->allPermissions());
     }
 
 
     public function updatePermission(UpdatePermissionRequest $request, $id)
     {
-        $data = $this->service->updatePermission($request->validated(), $id);
-        return !isset($data['error']) ? $this->successResponse($data, 'Permission updated successfully') : $this->errorResponse( 404, 'Cannot update Permission', $data['error']);
+        return $this->handleServiceResponse($this->service->updatePermission($request->validated(), $id));
     }
 } 

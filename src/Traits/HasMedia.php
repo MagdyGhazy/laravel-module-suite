@@ -98,7 +98,7 @@ trait HasMedia
     /**
      * Validate file size and type.
      */
-    private function validateFile(UploadedFile $file): array|bool
+    protected function validateFile(UploadedFile $file): array|bool
     {
         $mimeType = $file->getMimeType();
         $fileSize = $file->getSize();
@@ -303,15 +303,15 @@ trait HasMedia
     /**
      * Check if media belongs to the model.
      */
-    private function isMediaBelongsToModel(Model $media): bool
+    protected function isMediaBelongsToModel(Model $media): bool
     {
-        return $media->mediable_id === $this->id && $media->mediable_type === get_class($this);
+        return $media->mediable_id === $this->getKey() && $media->mediable_type === $this->getMorphClass();
     }
 
     /**
      * Store a file in storage.
      */
-    private function storeFile(UploadedFile $file, string $folder): string
+    protected function storeFile(UploadedFile $file, string $folder): string
     {
         $fileName = 'M-' . Str::random(10) . rand(1000, 9999) . '.' . $file->getClientOriginalExtension();
 
@@ -338,7 +338,7 @@ trait HasMedia
     /**
      * Delete a file from storage.
      */
-    private function deleteFile(?Model $media = null, ?string $path = null): void
+    protected function deleteFile(?Model $media = null, ?string $path = null): void
     {
         $filePath = $path ?? $media?->file_path;
 

@@ -161,16 +161,16 @@ class MakeModuleCommand extends Command
 
 
 
-             /** ===========| {$this->names['name']} |============================| {$date} |================= **/
-             Route::group(['prefix' => '{$this->names['small_name']}', 'middleware' => '{$authMiddleware}'], function () {
-                 Route::controller(\\App\\Http\\Controllers\\Api\\{$this->names['name']}\\{$this->names['controller_name']}::class)->group(function () {
-                     Route::get('/', 'index')->middleware('{$permissionMiddleware}:list {$this->names['small_plural_name']}');
-                     Route::get('/{id}', 'show')->middleware('{$permissionMiddleware}:show {$this->names['small_plural_name']}');
-                     Route::post('/', 'store')->middleware('{$permissionMiddleware}:create {$this->names['small_plural_name']}');
-                     Route::put('/{id}', 'update')->middleware('{$permissionMiddleware}:edit {$this->names['small_plural_name']}');
-                     Route::delete('/{id}', 'destroy')->middleware('{$permissionMiddleware}:delete {$this->names['small_plural_name']}');
-                 });
-             });
+            /** ===========| {$this->names['name']} |============================| {$date} |================= **/
+            Route::group(['prefix' => '{$this->names['small_name']}', 'middleware' => '{$authMiddleware}'], function () {
+                Route::controller(\\App\\Http\\Controllers\\Api\\{$this->names['name']}\\{$this->names['controller_name']}::class)->group(function () {
+                    Route::get('/', 'index')->middleware('{$permissionMiddleware}:list {$this->names['small_plural_name']}');
+                    Route::get('/{id}', 'show')->middleware('{$permissionMiddleware}:show {$this->names['small_plural_name']}');
+                    Route::post('/', 'store')->middleware('{$permissionMiddleware}:create {$this->names['small_plural_name']}');
+                    Route::put('/{id}', 'update')->middleware('{$permissionMiddleware}:edit {$this->names['small_plural_name']}');
+                    Route::delete('/{id}', 'destroy')->middleware('{$permissionMiddleware}:delete {$this->names['small_plural_name']}');
+                });
+            });
         ROUTE;
 
         File::append($routePath, $routeContent);
