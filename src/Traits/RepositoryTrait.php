@@ -18,42 +18,103 @@ trait RepositoryTrait
     protected function buildQuery(Builder $query, array $parameters = []): Builder|array
     {
         try {
+            // Select
             $query->when(!empty($parameters['select']), function ($query) use ($parameters) {
                 $query->select($parameters['select']);
             });
 
+            // Relations
             $query->when(!empty($parameters['relations']), function ($query) use ($parameters) {
                 $query->with($parameters['relations']);
             });
 
-            $query->when(!empty($parameters['where']) && is_array($parameters['where']), function ($query) use ($parameters) {
+            // Basic where
+            $query->when(!empty($parameters['where']), function ($query) use ($parameters) {
                 foreach ($parameters['where'] as $condition) {
-                    if (is_array($condition) && count($condition) >= 2) {
+                    if (is_array($condition)) {
                         $query->where(...$condition);
                     }
                 }
             });
 
-
-            $query->when(!empty($parameters['search']) && is_array($parameters['search']), function ($query) use ($parameters) {
-                $searchTerm = $parameters['search']['search'];
-                $columns = $parameters['search']['columns'];
-
-                if (method_exists($query, 'whereAny')) {
-                    $query->whereAny($columns, 'LIKE', "%{$searchTerm}%");
-                } else {
-                    // Fallback for older Laravel versions
-                    $query->where(function (Builder $q) use ($searchTerm, $columns) {
-                        foreach ($columns as $column) {
-                            $q->orWhere($column, 'LIKE', "%{$searchTerm}%");
-                        }
-                    });
+            // whereIn
+            $query->when(!empty($parameters['whereIn']), function ($query) use ($parameters) {
+                foreach ($parameters['whereIn'] as $condition) {
+                    if (count($condition) === 2) {
+                        [$column, $values] = $condition;
+                        $query->whereIn($column, $values);
+                    }
                 }
             });
 
-            $query->orderBy('created_at', 'desc');
+            // whereNotIn
+            $query->when(!empty($parameters['whereNotIn']), function ($query) use ($parameters) {
+                foreach ($parameters['whereNotIn'] as $condition) {
+                    if (count($condition) === 2) {
+                        [$column, $values] = $condition;
+                        $query->whereNotIn($column, $values);
+                    }
+                }
+            });
+
+            // whereNull
+            $query->when(!empty($parameters['whereNull']), function ($query) use ($parameters) {
+                foreach ($parameters['whereNull'] as $column) {
+                    $query->whereNull($column);
+                }
+            });
+
+            // whereNotNull
+            $query->when(!empty($parameters['whereNotNull']), function ($query) use ($parameters) {
+                foreach ($parameters['whereNotNull'] as $column) {
+                    $query->whereNotNull($column);
+                }
+            });
+
+            // whereBetween
+            $query->when(!empty($parameters['whereBetween']), function ($query) use ($parameters) {
+                foreach ($parameters['whereBetween'] as $condition) {
+                    if (count($condition) === 2) {
+                        [$column, $range] = $condition;
+                        $query->whereBetween($column, $range);
+                    }
+                }
+            });
+
+            // orWhere
+            $query->when(!empty($parameters['orWhere']), function ($query) use ($parameters) {
+                foreach ($parameters['orWhere'] as $condition) {
+                    if (is_array($condition)) {
+                        $query->orWhere(...$condition);
+                    }
+                }
+            });
+
+            // Search
+            $query->when(!empty($parameters['search']), function ($query) use ($parameters) {
+
+                $searchTerm = $parameters['search']['search'];
+                $columns    = $parameters['search']['columns'];
+
+                $query->where(function (Builder $q) use ($searchTerm, $columns) {
+                    foreach ($columns as $column) {
+                        $q->orWhere($column, 'LIKE', "%{$searchTerm}%");
+                    }
+                });
+            });
+
+            // Order
+            if (!empty($parameters['orderBy'])) {
+                foreach ($parameters['orderBy'] as $order) {
+                    [$column, $direction] = $order;
+                    $query->orderBy($column, $direction ?? 'asc');
+                }
+            } else {
+                $query->orderBy('created_at', 'desc');
+            }
 
             return $query;
+
         } catch (\Throwable $e) {
             return $this->handleError($e);
         }

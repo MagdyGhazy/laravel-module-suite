@@ -49,7 +49,7 @@ class RoleService
     {
         $parameters = [
             'select' => ['id', 'name'],
-            'relations' => ['permissions:id,name,description'],
+            'relations' => ['permissions:id,name,description,type'],
         ];
 
         return $this->wrap($this->getOne($this->model, $id, $parameters), 'Data retrieved');
@@ -114,11 +114,16 @@ class RoleService
     public function allPermissions(): ServiceResponse
     {
         $search = request()->get('search');
+        $type   = request()->get('type');
 
         $parameters = [
-            'select'    => ['id', 'name', 'description'],
-            'search' => $search ? ['search' => $search , 'columns' => ['name', 'description']] : null,
+            'select'    => ['id', 'name', 'description', 'type'],
+            'search' => $search ? ['search' => $search , 'columns' => ['name', 'description', 'type']] : null,
         ];
+
+        if ($type) {
+            $parameters['where'] = [['type', '=', $type]];
+        }
 
         $permissionModelClass = config('laravel-module-suite.permissions.model');
         return $this->wrap($this->getAll(new $permissionModelClass(), $parameters), 'Data retrieved');

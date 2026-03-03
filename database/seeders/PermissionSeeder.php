@@ -16,11 +16,16 @@ class PermissionSeeder extends Seeder
             foreach ($defaultPermissions as $action) {
                 $permissionModel::firstOrCreate(
                     ['name' => $action['name']],
-                    ['description' => $action['description'] ?? null]
+                    [
+                        'type'          => $action['type'] ?? null,
+                        'description'   => $action['description'] ?? null,
+                    ]
                 );
             }
 
-            $permissions = [];
+            $permissions = [
+                // 'examplemodules' => ['list', 'show', 'create', 'edit', 'delete'],
+            ];
 
             if (!empty($permissions)) {
                 foreach ($permissions as $module => $actions) {

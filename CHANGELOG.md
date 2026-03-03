@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.5] - 2026-03-03
+
+### Added
+- New query parameter options in `RepositoryTrait`: `whereIn`, `whereNotIn`, `whereNull`, `whereNotNull`, `whereBetween`, `orWhere`, and enhanced `orderBy` support.
+- README updated with examples for repository query parameters.
+- Permission `type` attribute support with corresponding migration and seeder updates.
+
+### Changed
+- RoleService queries now select `type` for permissions and permission listings.
+- General improvements to repository query building logic and comments.
+
+### Bumped
+- Package version to 2.0.5.
+
 ## [2.0.4] - 2026-02-27
 
 ### Fixed

@@ -182,6 +182,41 @@ return [
 ];
 ```
 
+## Repository Query Parameters
+
+You can customize queries when using the repository helpers by passing an array of parameters. The trait already supports `select`, `relations`, various `where*` clauses, searching, ordering, etc. Here are a few examples showing the new options you've added:
+
+```php
+$parameters = [
+    'select'    => ['id', 'name', 'description'],
+
+    'relations' => ['owner:id,name'],
+
+    'where' => [
+                ['status', '=', 'active'],
+                ['last_seen', '<', now()],
+           ],
+
+    'orderBy' => [
+        ['status', 'asc'],
+        ['created_at', 'desc'],
+    ],
+
+    'whereBetween' => [
+        ['created_at', ['2024-01-01', '2024-12-31']],
+    ],
+
+    'whereIn' => [
+        ['mappable_id', $branchIds],
+    ],
+    
+];
+
+$roles = $roleRepository->getAll(new Role, $parameters);
+```
+
+These options correspond directly to the conditions handled in `RepositoryTrait::buildQuery()`.
+
 ## API Routes
 
 The package provides the following API endpoints:
