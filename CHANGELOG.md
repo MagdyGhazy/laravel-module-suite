@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.6] - 2026-03-08
+
+### Changed
+- Updated service stub to use `MapperResource` for better resource mapping logic.
+
 ## [2.0.5] - 2026-03-03
 
 ### Added

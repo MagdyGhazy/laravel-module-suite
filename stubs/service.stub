@@ -7,7 +7,6 @@ use Ghazym\LaravelModuleSuite\Services\ServiceResponse;
 use App\Models\{{ name }};
 use App\Http\Resources\{{ name }}\{{ resource_name }};
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 class {{ service_name }}
 {
@@ -116,7 +115,11 @@ class {{ service_name }}
         }
 
         if ($result !== null) {
-            $result = ($result instanceof LengthAwarePaginator) ? {{ resource_name }}::collection($result) : new {{ resource_name }}($result);
+            if ($result instanceof \Illuminate\Database\Eloquent\Model) {
+                $result = new MapperResource($result);
+            } else {
+                $result = MapperResource::collection($result);
+            }
         }
 
         return ServiceResponse::success($result, $successMsg, $successCode);
