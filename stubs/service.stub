@@ -116,9 +116,9 @@ class {{ service_name }}
 
         if ($result !== null) {
             if ($result instanceof \Illuminate\Database\Eloquent\Model) {
-                $result = new MapperResource($result);
+                $result = new {{ resource_name }}($result);
             } else {
-                $result = MapperResource::collection($result);
+                $result = {{ resource_name }}::collection($result);
             }
         }
 
