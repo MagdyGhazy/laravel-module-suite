@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.8] - 2026-03-29
+
+### Added
+- New `Roleable` model for polymorphic role assignments.
+- Configuration support for `roleable` model in config file.
+
+### Changed
+- Updated `Role` model `roleables()` method to use `hasMany` relation instead of `morphMany`.
+
 ## [2.0.7] - 2026-03-08
 
 ### Changed

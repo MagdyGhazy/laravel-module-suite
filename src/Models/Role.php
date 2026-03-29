@@ -4,7 +4,6 @@ namespace Ghazym\LaravelModuleSuite\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Collection;
 use Ghazym\LaravelModuleSuite\Traits\HasPermissions;
 
@@ -17,9 +16,9 @@ class Role extends Model
     /**
      * Get all models that have this role.
      */
-    public function roleables(): MorphMany
+    public function roleables()
     {
-        return $this->morphMany(config('laravel-module-suite.roles.model'), 'roleable');
+        return $this->hasMany(config('laravel-module-suite.roleable.model'), 'role_id');
     }
 
     /**

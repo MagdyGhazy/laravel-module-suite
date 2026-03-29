@@ -123,6 +123,10 @@ return [
             ],
         ],
     ],
+    
+    'roleable' => [
+        'model' => \Ghazym\LaravelModuleSuite\Models\Roleable::class,
+    ],
 
     'permissions' => [
         'model' => \Ghazym\LaravelModuleSuite\Models\Permission::class,
