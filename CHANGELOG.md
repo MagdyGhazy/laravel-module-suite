@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.9] - 2026-03-29
+
+### Changed
+- `RoleService`: include `description` in role list and show queries; search roles by `name` and `description`.
+
 ## [2.0.8] - 2026-03-29
 
 ### Added
