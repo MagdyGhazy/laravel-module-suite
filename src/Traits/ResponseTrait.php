@@ -45,12 +45,13 @@ trait ResponseTrait
         ];
 
         if ($data instanceof JsonResource || $data instanceof AnonymousResourceCollection) {
-
             $resourceData = $data->response()->getData(true);
             $response['data'] = $resourceData['data'];
 
-            if (isset($resourceData['additional'])) {
-                $response['meta'] = $resourceData['additional'];
+            $knownKeys = ['data', 'links', 'meta'];
+            $additional = array_diff_key($resourceData, array_flip($knownKeys));
+            if (!empty($additional)) {
+                $response['meta'] = $additional;
             }
 
             if (isset($resourceData['meta'])) {
@@ -72,9 +73,17 @@ trait ResponseTrait
                 'current_page' => $data->currentPage(),
                 'last_page'    => $data->lastPage(),
                 'from'         => $data->firstItem(),
-                'to'           => $data->lastItem()
+                'to'           => $data->lastItem(),
             ];
-            
+
+        } elseif (is_array($data) && isset($data['meta'], $data['data'])) {
+            $response['meta'] = $data['meta'];
+            $response['data'] = $data['data'];
+
+            if (isset($data['pagination'])) {
+                $response['pagination'] = $data['pagination'];
+            }
+
         } else {
             $response['data'] = $data;
         }

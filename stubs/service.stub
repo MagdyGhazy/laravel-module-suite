@@ -4,9 +4,10 @@ namespace App\Http\Services\{{ name }};
 
 use Ghazym\LaravelModuleSuite\Traits\RepositoryTrait;
 use Ghazym\LaravelModuleSuite\Services\ServiceResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Resources\Json\JsonResource;
 use App\Models\{{ name }};
 use App\Http\Resources\{{ name }}\{{ resource_name }};
-use Illuminate\Database\Eloquent\Builder;
 
 class {{ service_name }}
 {
@@ -115,7 +116,10 @@ class {{ service_name }}
         }
 
         if ($result !== null) {
-            if ($result instanceof \Illuminate\Database\Eloquent\Model) {
+
+            if ($result instanceof JsonResource || $result instanceof AnonymousResourceCollection) {
+                
+            } elseif ($result instanceof \Illuminate\Database\Eloquent\Model) {
                 $result = new {{ resource_name }}($result);
             } else {
                 $result = {{ resource_name }}::collection($result);

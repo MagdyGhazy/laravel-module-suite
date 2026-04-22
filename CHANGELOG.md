@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.11] - 2026-04-22
+
+### Added
+- Support for `JsonResource` and `AnonymousResourceCollection` types in service stub.
+- Enhanced metadata handling in `ResponseTrait` to capture all additional response fields beyond standard keys.
+
+### Changed
+- Updated `ResponseTrait` to improve handling of additional metadata from resource responses.
+- Refined service stub imports and resource type detection logic.
+- Updated service stub to remove unused imports and add necessary resource type declarations.
+
 ## [2.0.10] - 2026-04-22
 
 ### Added
