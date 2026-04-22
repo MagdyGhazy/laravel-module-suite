@@ -2,12 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
-## [2.0.9] - 2026-03-29
+## [2.0.10] - 2026-04-22
+
+### Added
+- `type` column to roles table migration.
+- `type` attribute support for roles and permissions with corresponding validation in requests.
+- Support for `additional` meta data in `ResponseTrait` for resource responses.
 
 ### Changed
-- `RoleService`: include `description` in role list and show queries; search roles by `name` and `description`.
+- `Role` model fillable now includes `type`.
+- `RoleService` queries now select and search by `type` for roles.
+- Minor formatting improvements in `ResponseTrait`.
 
-## [2.0.8] - 2026-03-29
+## [2.0.9] - 2026-03-29
 
 ### Added
 - New `Roleable` model for polymorphic role assignments.

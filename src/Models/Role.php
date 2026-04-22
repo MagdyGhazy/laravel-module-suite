@@ -11,7 +11,7 @@ class Role extends Model
 {
     use HasPermissions;
 
-    protected $fillable = ['name', 'description'];
+    protected $fillable = ['name', 'description', 'type'];
 
     /**
      * Get all models that have this role.

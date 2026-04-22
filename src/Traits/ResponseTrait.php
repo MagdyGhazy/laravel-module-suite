@@ -6,8 +6,6 @@ use Ghazym\LaravelModuleSuite\Services\ServiceResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Http\Resources\Json\ResourceCollection;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 trait ResponseTrait
 {
@@ -51,6 +49,10 @@ trait ResponseTrait
             $resourceData = $data->response()->getData(true);
             $response['data'] = $resourceData['data'];
 
+            if (isset($resourceData['additional'])) {
+                $response['meta'] = $resourceData['additional'];
+            }
+
             if (isset($resourceData['meta'])) {
                 $response['pagination'] = [
                     'total'        => $resourceData['meta']['total'] ?? 0,
@@ -61,8 +63,8 @@ trait ResponseTrait
                     'to'           => $resourceData['meta']['to'] ?? 0,
                 ];
             }
-        }
-        elseif ($data instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+
+        } elseif ($data instanceof \Illuminate\Pagination\LengthAwarePaginator) {
             $response['data'] = $data->items();
             $response['pagination'] = [
                 'total'        => $data->total(),
@@ -72,9 +74,8 @@ trait ResponseTrait
                 'from'         => $data->firstItem(),
                 'to'           => $data->lastItem()
             ];
-        }
-
-        else {
+            
+        } else {
             $response['data'] = $data;
         }
 

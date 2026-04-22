@@ -30,8 +30,8 @@ class RoleService
         $perPage = request()->get('limit', 10);
 
         $parameters = [
-            'select' => ['id', 'name', 'description'],
-            'search' => $search ? ['search' => $search , 'columns' => ['name', 'description']] : null,
+            'select' => ['id', 'name', 'description', 'type'],
+            'search' => $search ? ['search' => $search , 'columns' => ['name', 'description', 'type']] : null,
         ];
 
         $query = $this->query($this->model, $parameters);
@@ -48,7 +48,7 @@ class RoleService
     public function show(int $id): ServiceResponse
     {
         $parameters = [
-            'select' => ['id', 'name', 'description'],
+            'select' => ['id', 'name', 'description', 'type'],
             'relations' => ['permissions:id,name,description,type'],
         ];
 

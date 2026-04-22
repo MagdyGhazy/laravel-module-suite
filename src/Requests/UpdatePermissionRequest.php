@@ -23,6 +23,7 @@ class UpdatePermissionRequest extends FormRequest
     {
         return [
             'description'      => 'required|string|max:255',
+            'type'             => 'nullable|string|max:255',
         ];
     }
 }
