@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.12] - 2026-06-11
+
+### Added
+- PHP 8.4 support in `composer.json` requirements.
+- Laravel 13 support in `composer.json` requirements.
+
+### Changed
+- Updated `orchestra/testbench` dependency to support version 13.
+
 ## [2.0.11] - 2026-04-22
 
 ### Added
